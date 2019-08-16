@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+node_modules
+dist
+.nyc_output
+coverage/
+.nyc_output/
+coverage-unit/
+coverage-int/
