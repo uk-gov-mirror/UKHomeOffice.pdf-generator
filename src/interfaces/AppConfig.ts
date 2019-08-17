@@ -1,0 +1,31 @@
+interface AppConfig {
+    keycloak: {
+        protocol: string,
+        url: string,
+        realm: string,
+        client: {
+            secret: string,
+            id: string,
+        },
+    };
+    aws: {
+        s3: {
+            endpoint: string,
+            useSSL: boolean,
+            port: number,
+            accessKey: string,
+            secretKey: string
+            buckets: {
+                pdf: string,
+            },
+        },
+    };
+    redis: {
+        port: number,
+        host: string,
+        token: string,
+    };
+    correlationIdRequestHeader: string;
+}
+
+export default AppConfig;

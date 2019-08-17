@@ -1,0 +1,63 @@
+import {provide} from 'inversify-binding-decorators';
+import TYPE from '../constant/TYPE';
+import {inject} from 'inversify';
+import AppConfig from '../interfaces/AppConfig';
+import {Client} from 'minio';
+
+@provide(TYPE.S3Service)
+export class S3Service {
+    private minioClient: Client;
+
+    constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig) {
+        const s3: {
+            endpoint: string,
+            useSSL: boolean,
+            port: number,
+            accessKey: string,
+            secretKey: string,
+        } = this.appConfig.aws.s3;
+        this.minioClient = new Client({
+            endPoint: s3.endpoint,
+            useSSL: s3.useSSL,
+            port: s3.port,
+            accessKey: s3.accessKey,
+            secretKey: s3.secretKey,
+        });
+
+    }
+
+    public async upload(bucketName: string,
+                        file: Buffer,
+                        objectName: string,
+                        metaData?: object): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.minioClient.putObject(bucketName, objectName, file, file.length,
+                metaData,
+                (err, etag) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(etag);
+                    }
+                });
+        });
+    }
+
+    public async uploadFile(bucketName: string,
+                            filePath: string,
+                            objectName: string,
+                            metaData?: object): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.minioClient.fPutObject(bucketName, objectName, filePath,
+                metaData,
+                (err, etag) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(etag);
+                    }
+                });
+        });
+    }
+
+}
