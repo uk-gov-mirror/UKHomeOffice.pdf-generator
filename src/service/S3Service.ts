@@ -3,6 +3,7 @@ import TYPE from '../constant/TYPE';
 import {inject} from 'inversify';
 import AppConfig from '../interfaces/AppConfig';
 import {Client} from 'minio';
+import logger from '../util/logger';
 
 @provide(TYPE.S3Service)
 export class S3Service {
@@ -37,7 +38,10 @@ export class S3Service {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(etag);
+                        logger.info(`Successfully ${objectName} uploaded to S3`, {
+                            etag,
+                        });
+                        resolve(`${this.appConfig.aws.s3.endpoint}/${this.appConfig.aws.s3.buckets.pdf}/${objectName}`);
                     }
                 });
         });
@@ -54,7 +58,10 @@ export class S3Service {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(etag);
+                        logger.info(`Successfully ${objectName} uploaded to S3`, {
+                            etag,
+                        });
+                        resolve(`${this.appConfig.aws.s3.endpoint}/${this.appConfig.aws.s3.buckets.pdf}/${objectName}`);
                     }
                 });
         });

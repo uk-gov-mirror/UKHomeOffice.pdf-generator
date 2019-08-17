@@ -1,4 +1,5 @@
 interface AppConfig {
+    port: number;
     keycloak: {
         protocol: string,
         url: string,

@@ -10,4 +10,6 @@ export default {
   FormPdfGenerator: Symbol.for('FormPdfGenerator'),
   FormWizardPdfGenerator: Symbol.for('FormWizardPdfGenerator'),
   PdfGenerator: Symbol.for('PdfGenerator'),
+  WebhookPostQueue: Symbol.for('WebhookPostQueue'),
+  WebhookProcessor: Symbol.for('WebhookProcessor'),
 };

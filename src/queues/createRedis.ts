@@ -1,15 +1,13 @@
 import Redis from 'ioredis';
 import AppConfig from '../interfaces/AppConfig';
+import IORedis = require('ioredis');
 
-const redis = (appConfig: AppConfig) => {
+const createRedis = (appConfig: AppConfig): IORedis.Redis => {
     if (appConfig.redis.token) {
         return new Redis({
             port: appConfig.redis.port,
             host: appConfig.redis.host,
             password: appConfig.redis.token,
-            tls: {
-                servername: appConfig.redis.host,
-            },
         });
     }
     return new Redis({
@@ -19,4 +17,4 @@ const redis = (appConfig: AppConfig) => {
 
 };
 
-export default redis;
+export default createRedis;

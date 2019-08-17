@@ -4,10 +4,10 @@ import {ApplicationContext} from "../../src/container/ApplicationContext";
 import TYPE from "../../src/constant/TYPE";
 import {cleanUpMetadata} from "inversify-express-utils";
 import {Queue} from "bull";
-import {PdfJob} from "../../src/pdf/PdfJob";
+import {PdfJob} from "../../src/model/PdfJob";
 
-import * as createQueueModule from "../../src/queues/create-queue";
-import * as redisFunction from '../../src/queues/Redis';
+import * as createQueueModule from "../../src/queues/createQueue";
+import * as redisFunction from '../../src/queues/createRedis';
 import {ImportMock} from 'ts-mock-imports';
 import {Substitute} from "@fluffy-spoon/substitute";
 import MockRedis from 'ioredis-mock';
