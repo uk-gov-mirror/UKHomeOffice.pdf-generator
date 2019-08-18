@@ -25,8 +25,8 @@ const defaultAppConfig: AppConfig = {
     port: PDF_GENERATOR_PORT ? +PDF_GENERATOR_PORT : DEFAULT_PORT,
     keycloak: {
         protocol: KEYCLOAK_PROTOCOL || 'http://',
-        url: KEYCLOAK_URL || 'localhost',
-        realm: KEYCLOAK_REALM,
+        url: KEYCLOAK_URL || 'localhost:8080/auth',
+        realm: KEYCLOAK_REALM || 'elf',
         client: {
             secret: PDF_GENERATOR_KEYCLOAK_SECRET,
             id: PDF_GENERATOR_KEYCLOAK_CLIENT_ID,

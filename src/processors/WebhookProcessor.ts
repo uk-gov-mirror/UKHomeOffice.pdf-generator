@@ -22,7 +22,7 @@ export class WebhookProcessor {
 
     @postConstruct()
     public init(): void {
-        logger.info(`Webhook job processing ready`);
+        logger.info(`Web-hook job processing ready`);
         this.webhookQueue.on('completed', async (job: Job, result: any) => {
             logger.info(`${result.message}`, {
                 cluster: {
@@ -35,14 +35,14 @@ export class WebhookProcessor {
         });
         this.webhookQueue.on('failed', async (job: Job, error: Error) => {
             if (job.attemptsMade < job.opts.attempts) {
-                logger.warn(`Webhook post failed...retrying`, {
+                logger.warn(`Web-hook post failed...retrying`, {
                     cluster: {
                         workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                         jobId: job.id,
                     },
                 });
             } else {
-                logger.error(`Webhook job failed for ${job.data.url} after max retries. Removing job`,
+                logger.error(`Web-hook job failed for ${job.data.url} after max retries. Removing job`,
                     {error: error.message});
                 await job.remove();
             }
@@ -52,7 +52,7 @@ export class WebhookProcessor {
             const webhookJob: WebhookJob = job.data;
             const accessToken = await this.kecycloakService.getAccessToken();
             try {
-                logger.info(`Sending webhook notificaton for pdf generated`);
+                logger.info(`Sending web-hook notificaton for pdf generated`);
                 const response = await axiosInstance.post(webhookJob.url, webhookJob.payload, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
@@ -72,7 +72,7 @@ export class WebhookProcessor {
                     });
                 }
             } catch (err) {
-                logger.error(`Failed to perform webhook post`, err);
+                logger.error(`Failed to perform web-hook post`, err);
                 return Promise.reject(err);
             }
         });

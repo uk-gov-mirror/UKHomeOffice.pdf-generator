@@ -5,5 +5,5 @@ export class ApplicationConstants {
     public static readonly ANONYMOUS = 'anonymous';
     public static readonly SHUTDOWN_EVENT = 'shutdown';
     public static readonly PDF_QUEUE_NAME = 'pdf-queue';
-    public static readonly WEBHOOK_POST_QUEUE_NAME = 'webhook-post-queue';
+    public static readonly WEB_HOOK_POST_QUEUE_NAME = 'web-hook-post-queue';
 }

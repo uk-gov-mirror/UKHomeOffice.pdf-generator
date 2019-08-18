@@ -42,7 +42,7 @@ export class ApplicationContext {
         const webhookQueue: Queue<PdfJob> = createQueue(webhookRedisClient,
             webhookRedisClient,
             webhookRedisClient,
-            ApplicationConstants.WEBHOOK_POST_QUEUE_NAME);
+            ApplicationConstants.WEB_HOOK_POST_QUEUE_NAME);
 
         this.container.bind<Queue>(TYPE.WebhookPostQueue).toConstantValue(webhookQueue);
 
