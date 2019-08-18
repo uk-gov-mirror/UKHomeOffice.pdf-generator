@@ -24,6 +24,7 @@ export class PdfProcessor {
 
     @postConstruct()
     public init(): void {
+        logger.info(`PDF job processing ready`);
         this.pdfQueue.on('completed', async (job: Job, result: any) => {
             logger.info(`${result.message}`, {
                 cluster: {
@@ -32,6 +33,7 @@ export class PdfProcessor {
                 },
                 fileLocation: result.fileLocation,
             });
+            await job.remove();
         });
         this.pdfQueue.on('failed', async (job) => {
             logger.error(`PDF generation job failed`, {
@@ -61,7 +63,7 @@ export class PdfProcessor {
                         },
                     })
                 ;
-                await this.webhookQueue.add(webHookJob);
+                await this.webhookQueue.add(webHookJob, { attempts: 5, backoff: 5000 });
                 done(null, result);
             } catch (err) {
                 logger.error('PDF generation failed', err);

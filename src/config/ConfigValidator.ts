@@ -16,6 +16,7 @@ export class ConfigValidator {
                     id: Joi.string(),
                 }),
             }),
+            port: Joi.number().optional(),
             redis: Joi.object().keys({
                 port: Joi.number(),
                 host: Joi.string(),

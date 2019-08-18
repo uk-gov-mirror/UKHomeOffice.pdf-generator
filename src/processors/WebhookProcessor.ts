@@ -9,6 +9,7 @@ import {KeycloakService} from '../service/KeycloakService';
 import {WebhookJob} from '../model/WebhookJob';
 import axiosInstance from '../util/axios';
 import HttpStatus from 'http-status-codes';
+import * as cluster from 'cluster';
 
 @provide(TYPE.WebhookProcessor)
 export class WebhookProcessor {
@@ -21,7 +22,33 @@ export class WebhookProcessor {
 
     @postConstruct()
     public init(): void {
-        this.webhookQueue.process(async (job: Job, done: any) => {
+        logger.info(`Webhook job processing ready`);
+        this.webhookQueue.on('completed', async (job: Job, result: any) => {
+            logger.info(`${result.message}`, {
+                cluster: {
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                    jobId: job.id,
+                },
+                status: result.status,
+            });
+            await job.remove();
+        });
+        this.webhookQueue.on('failed', async (job: Job, error: Error) => {
+            if (job.attemptsMade < job.opts.attempts) {
+                logger.warn(`Webhook post failed...retrying`, {
+                    cluster: {
+                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                        jobId: job.id,
+                    },
+                });
+            } else {
+                logger.error(`Webhook job failed for ${job.data.url} after max retries. Removing job`,
+                    {error: error.message});
+                await job.remove();
+            }
+
+        });
+        this.webhookQueue.process(async (job: Job) => {
             const webhookJob: WebhookJob = job.data;
             const accessToken = await this.kecycloakService.getAccessToken();
             try {
@@ -34,25 +61,21 @@ export class WebhookProcessor {
 
                 const responseStatus = response.status;
                 if (responseStatus === HttpStatus.OK || responseStatus === HttpStatus.ACCEPTED) {
-                    done(null, {
+                    return Promise.resolve({
                         status: responseStatus,
                         message: `${webhookJob.url} successfully posted`,
                     });
                 } else {
-                    if (responseStatus === HttpStatus.SERVICE_UNAVAILABLE
-                        || responseStatus === HttpStatus.BAD_REQUEST) {
-                        logger.warn('Retryable Http exception');
-                        job.retry();
-                    } else {
-                        const message = 'Failed to post to web hook url ' + webhookJob.url +
-                            ' due to ' + JSON.stringify(response.data);
-                        done(new Error(message), null);
-                    }
+                    return Promise.reject({
+                        status: responseStatus,
+                        message: `${webhookJob.url}  post failed`,
+                    });
                 }
             } catch (err) {
-                logger.error(err);
-                done(err);
+                logger.error(`Failed to perform webhook post`, err);
+                return Promise.reject(err);
             }
         });
     }
+
 }
