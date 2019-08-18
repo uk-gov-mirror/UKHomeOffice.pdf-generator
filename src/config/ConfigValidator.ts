@@ -25,6 +25,7 @@ export class ConfigValidator {
             correlationIdRequestHeader: Joi.string(),
             aws: Joi.object().optional().keys({
                 s3: Joi.object().keys({
+                    protocol: Joi.string(),
                     endpoint: Joi.string().optional(),
                     useSSL: Joi.boolean().optional(),
                     port: Joi.number().optional(),

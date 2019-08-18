@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {expect} from 'chai'
 import {KeycloakService} from '../../../src/service/KeycloakService';
 import defaultAppConfig from '../../../src/config/defaultAppConfig';
+// @ts-ignore
 import nock from 'nock'
 
 import * as querystring from 'querystring';

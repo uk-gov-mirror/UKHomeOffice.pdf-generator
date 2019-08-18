@@ -11,6 +11,7 @@ interface AppConfig {
     };
     aws: {
         s3: {
+            protocol: string,
             endpoint: string,
             useSSL: boolean,
             port: number,

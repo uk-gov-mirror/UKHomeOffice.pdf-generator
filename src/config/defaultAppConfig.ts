@@ -18,6 +18,7 @@ const {
     PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME,
     PDF_GENERATOR_AWS_S3_ACCESS_KEY,
     PDF_GENERATOR_AWS_S3_SECRET_KEY,
+    PDF_GENERATOR_AWS_S3_PROTOCOL,
     PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER,
 } = process.env;
 
@@ -39,6 +40,7 @@ const defaultAppConfig: AppConfig = {
     },
     aws: {
         s3: {
+            protocol: PDF_GENERATOR_AWS_S3_PROTOCOL || 'https://',
             endpoint: PDF_GENERATOR_AWS_S3_ENDPOINT || '127.0.0.1',
             buckets: {
                 pdf: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME || 'pdf',

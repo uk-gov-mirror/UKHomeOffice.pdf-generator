@@ -7,7 +7,8 @@ import logger from '../util/logger';
 
 @provide(TYPE.S3Service)
 export class S3Service {
-    private minioClient: Client;
+    private readonly minioClient: Client;
+    private readonly s3Url: string;
 
     constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig) {
         const s3: {
@@ -24,6 +25,8 @@ export class S3Service {
             accessKey: s3.accessKey,
             secretKey: s3.secretKey,
         });
+        this.s3Url = this.appConfig.aws.s3.protocol +
+            this.appConfig.aws.s3.endpoint + '/' + this.appConfig.aws.s3.buckets.pdf;
 
     }
 
@@ -41,7 +44,7 @@ export class S3Service {
                         logger.info(`Successfully ${objectName} uploaded to S3`, {
                             etag,
                         });
-                        resolve(`${this.appConfig.aws.s3.endpoint}/${this.appConfig.aws.s3.buckets.pdf}/${objectName}`);
+                        resolve(`${this.s3Url}/${objectName}`);
                     }
                 });
         });
@@ -61,7 +64,7 @@ export class S3Service {
                         logger.info(`Successfully ${objectName} uploaded to S3`, {
                             etag,
                         });
-                        resolve(`${this.appConfig.aws.s3.endpoint}/${this.appConfig.aws.s3.buckets.pdf}/${objectName}`);
+                        resolve(`${this.s3Url}/${objectName}`);
                     }
                 });
         });
