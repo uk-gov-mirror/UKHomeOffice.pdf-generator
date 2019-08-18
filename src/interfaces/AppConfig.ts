@@ -10,6 +10,9 @@ interface AppConfig {
             id: string,
         },
     };
+    arena: {
+        accessRoles: string[]
+    }
     aws: {
         s3: {
             protocol: string,

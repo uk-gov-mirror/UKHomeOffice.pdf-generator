@@ -11,8 +11,9 @@ import {ApplicationConstants} from './constant/ApplicationConstants';
 import {ConfigValidator} from './config/ConfigValidator';
 import {EventEmitter} from 'events';
 import Arena from 'bull-arena';
-import Keycloak from 'keycloak-connect';
+import Keycloak, {Token} from 'keycloak-connect';
 import session from 'express-session';
+import _ from 'lodash';
 
 const applicationContext: ApplicationContext = new ApplicationContext();
 const container = applicationContext.iocContainer();
@@ -79,7 +80,17 @@ expressApp.use(session({
     store: memoryStore,
 }));
 expressApp.use(keycloak.middleware({}));
-expressApp.use('/admin', keycloak.protect(), arenaConfig);
+expressApp.use('/admin', keycloak.protect((token : Token, req: express.Request) => {
+    if (appConfig.arena.accessRoles.length !== 0) {
+        let hasAccess = false;
+        appConfig.arena.accessRoles.forEach((role: string) => {
+            hasAccess =  token.hasRealmRole(role);
+        });
+        return hasAccess;
+    } else {
+        return true;
+    }
+}), arenaConfig);
 
 expressApp.use(httpContext.middleware);
 
