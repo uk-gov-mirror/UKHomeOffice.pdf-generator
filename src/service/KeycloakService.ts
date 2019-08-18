@@ -13,7 +13,7 @@ export class KeycloakService {
 
     constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig) {
         const keycloak: any = appConfig.keycloak;
-        this.keycloakUrl = keycloak.protocol.concat(keycloak.url);
+        this.keycloakUrl = keycloak.protocol.concat(keycloak.uri);
     }
 
     public async getAccessToken(): Promise<string> {

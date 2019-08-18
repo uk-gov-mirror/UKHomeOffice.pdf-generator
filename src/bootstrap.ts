@@ -10,6 +10,9 @@ import AppConfig from './interfaces/AppConfig';
 import {ApplicationConstants} from './constant/ApplicationConstants';
 import {ConfigValidator} from './config/ConfigValidator';
 import {EventEmitter} from 'events';
+import Arena from 'bull-arena';
+import Keycloak from 'keycloak-connect';
+import session from 'express-session';
 
 const applicationContext: ApplicationContext = new ApplicationContext();
 const container = applicationContext.iocContainer();
@@ -26,10 +29,57 @@ if (result.error) {
     logger.error('Config failed validation', result.error.details);
     process.exit(1);
 }
-
 const basePath = ``;
-
 const expressApp: Application = express();
+
+const arenaConfig = Arena({
+        queues: [
+            {
+                name: ApplicationConstants.PDF_QUEUE_NAME,
+                hostId: 'PDFGeneratorQueues',
+                redis: {
+                    port: appConfig.redis.port,
+                    host: appConfig.redis.host,
+                    password: appConfig.redis.token,
+                },
+            },
+            {
+                name: ApplicationConstants.WEB_HOOK_POST_QUEUE_NAME,
+                hostId: 'Web-HookQueues',
+                redis: {
+                    port: appConfig.redis.port,
+                    host: appConfig.redis.host,
+                    password: appConfig.redis.token,
+                },
+            },
+        ],
+    },
+    {
+        basePath: '/arena',
+        disableListen: true,
+    });
+
+const kcConfig = {
+    'realm': appConfig.keycloak.realm,
+    'auth-server-url': `${appConfig.keycloak.protocol}${appConfig.keycloak.uri}`,
+    'ssl-required': 'external',
+    'bearer-only': false,
+    'resource': appConfig.keycloak.client.id,
+    'credentials': {
+        secret: appConfig.keycloak.client.secret,
+    },
+    'confidential-port': 0,
+};
+const memoryStore: session.MemoryStore = new session.MemoryStore();
+const keycloak: Keycloak = new Keycloak({store: memoryStore}, kcConfig);
+expressApp.use(session({
+    secret: 'thisShouldBeLongAndSecret',
+    resave: false,
+    saveUninitialized: true,
+    store: memoryStore,
+}));
+expressApp.use(keycloak.middleware({}));
+expressApp.use('/admin', keycloak.protect(), arenaConfig);
 
 expressApp.use(httpContext.middleware);
 

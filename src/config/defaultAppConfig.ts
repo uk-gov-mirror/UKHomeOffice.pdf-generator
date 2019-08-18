@@ -1,5 +1,6 @@
 import AppConfig from '../interfaces/AppConfig';
 import {ApplicationConstants} from '../constant/ApplicationConstants';
+import uuid4 from 'uuid';
 
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_PORT: number = 3000;
@@ -7,10 +8,11 @@ const DEFAULT_PORT: number = 3000;
 const {
     KEYCLOAK_PROTOCOL,
     PDF_GENERATOR_PORT,
-    KEYCLOAK_URL,
+    KEYCLOAK_URI,
     PDF_GENERATOR_KEYCLOAK_CLIENT_ID,
     KEYCLOAK_REALM,
     PDF_GENERATOR_KEYCLOAK_SECRET,
+    PDF_GENERATOR_KEYCLOAK_SESSION_SECRET,
     REDIS_PORT,
     REDIS_URI,
     REDIS_TOKEN,
@@ -25,8 +27,9 @@ const {
 const defaultAppConfig: AppConfig = {
     port: PDF_GENERATOR_PORT ? +PDF_GENERATOR_PORT : DEFAULT_PORT,
     keycloak: {
+        sessionSecret: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET,
         protocol: KEYCLOAK_PROTOCOL || 'http://',
-        url: KEYCLOAK_URL || 'localhost:8080/auth',
+        uri: KEYCLOAK_URI || 'localhost:8080/auth',
         realm: KEYCLOAK_REALM || 'elf',
         client: {
             secret: PDF_GENERATOR_KEYCLOAK_SECRET,

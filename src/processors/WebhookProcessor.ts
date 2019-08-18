@@ -44,15 +44,13 @@ export class WebhookProcessor {
             } else {
                 logger.error(`Web-hook job failed for ${job.data.url} after max retries. Removing job`,
                     {error: error.message});
-                await job.remove();
             }
-
         });
         this.webhookQueue.process(async (job: Job) => {
             const webhookJob: WebhookJob = job.data;
             const accessToken = await this.kecycloakService.getAccessToken();
             try {
-                logger.info(`Sending web-hook notificaton for pdf generated`);
+                logger.info(`Sending web-hook notification for pdf generated`);
                 const response = await axiosInstance.post(webhookJob.url, webhookJob.payload, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,

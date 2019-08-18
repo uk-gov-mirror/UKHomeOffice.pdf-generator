@@ -1,8 +1,9 @@
 interface AppConfig {
     port: number;
     keycloak: {
+        sessionSecret: string,
         protocol: string,
-        url: string,
+        uri: string,
         realm: string,
         client: {
             secret: string,
