@@ -58,14 +58,23 @@ export class ApplicationContext {
 
         logger.info('Application context initialised');
 
-        eventEmitter.on(ApplicationConstants.SHUTDOWN_EVENT, async () => {
+        eventEmitter.on(ApplicationConstants.SHUTDOWN_EVENT, () => {
             this.container.unbindAll();
+
             pdfRedisClient.disconnect();
             webhookRedisClient.disconnect();
+            logger.info('Disconnected redis clients');
 
-            await pdfQueue.close();
-            await webhookQueue.close();
-
+            pdfQueue.close().then(() => {
+                logger.info('Closed pdf queue');
+            }).catch((err) => {
+                logger.error('Failed to close pdf queue', err);
+            });
+            webhookQueue.close().then(() => {
+                logger.info('Closed web-hook queue');
+            }).catch((err) => {
+                logger.error('Failed to close web-hook queue', err);
+            });
             logger.info('Container unbindAll activated');
         });
     }

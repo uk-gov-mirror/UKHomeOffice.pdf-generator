@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import AppConfig from '../interfaces/AppConfig';
-import IORedis = require('ioredis');
+import IORedis from 'ioredis';
 
 const createRedis = (appConfig: AppConfig): IORedis.Redis => {
     if (appConfig.redis.token) {

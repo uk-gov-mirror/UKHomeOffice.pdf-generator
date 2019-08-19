@@ -18,7 +18,7 @@ export class ConfigValidator {
                 }),
             }),
             arena: Joi.object().optional().keys({
-                accessRoles: Joi.array().items(Joi.string()).optional()
+                accessRoles: Joi.array().items(Joi.string()).optional(),
             }),
             port: Joi.number().optional(),
             redis: Joi.object().keys({

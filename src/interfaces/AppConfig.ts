@@ -11,8 +11,8 @@ interface AppConfig {
         },
     };
     arena: {
-        accessRoles: string[]
-    }
+        accessRoles: string[],
+    };
     aws: {
         s3: {
             protocol: string,

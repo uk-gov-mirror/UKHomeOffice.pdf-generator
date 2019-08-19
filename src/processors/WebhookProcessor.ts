@@ -42,7 +42,7 @@ export class WebhookProcessor {
                     },
                 });
             } else {
-                logger.error(`Web-hook job failed for ${job.data.url} after max retries. Removing job`,
+                logger.error(`Web-hook job failed for ${job.data.url} after max retries.`,
                     {error: error.message});
             }
         });

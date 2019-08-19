@@ -13,7 +13,6 @@ import {EventEmitter} from 'events';
 import Arena from 'bull-arena';
 import Keycloak, {Token} from 'keycloak-connect';
 import session from 'express-session';
-import _ from 'lodash';
 
 const applicationContext: ApplicationContext = new ApplicationContext();
 const container = applicationContext.iocContainer();
@@ -74,17 +73,17 @@ const kcConfig = {
 const memoryStore: session.MemoryStore = new session.MemoryStore();
 const keycloak: Keycloak = new Keycloak({store: memoryStore}, kcConfig);
 expressApp.use(session({
-    secret: 'thisShouldBeLongAndSecret',
+    secret: appConfig.keycloak.sessionSecret,
     resave: false,
     saveUninitialized: true,
     store: memoryStore,
 }));
-expressApp.use(keycloak.middleware({}));
-expressApp.use('/admin', keycloak.protect((token : Token, req: express.Request) => {
+expressApp.use(keycloak.middleware());
+expressApp.use('/admin', keycloak.protect((token: Token, req: express.Request) => {
     if (appConfig.arena.accessRoles.length !== 0) {
         let hasAccess = false;
         appConfig.arena.accessRoles.forEach((role: string) => {
-            hasAccess =  token.hasRealmRole(role);
+            hasAccess = token.hasRealmRole(role);
         });
         return hasAccess;
     } else {
