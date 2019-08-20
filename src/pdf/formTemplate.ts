@@ -5,8 +5,8 @@ const template = `<html>
     <script src='https://unpkg.com/formiojs@4.0.0-rc.27/dist/formio.full.js'></script>
     <script type='text/javascript'>
       window.onload = function() {
-       Formio.createForm(document.getElementById('formio'), {{{json formSchema}}}).then(function(form) {
-           form.submission = {{{json submission}}}
+       Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>).then(function(form) {
+           form.submission =  <%- JSON.stringify(submission) %>
         });
       };
     </script>

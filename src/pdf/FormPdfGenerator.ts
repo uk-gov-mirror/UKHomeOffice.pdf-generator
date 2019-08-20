@@ -45,7 +45,7 @@ export class FormPdfGenerator extends PdfGenerator {
 
         try {
             await page.goto(`file://${tempHtmlFile}`,
-                {waitUntil: ['networkidle0', 'load', 'domcontentloaded']});
+                {waitUntil: ['networkidle0', 'load', 'domcontentloaded'], timeout: 0});
 
             const pdf = await page.pdf({format: 'A4'});
 

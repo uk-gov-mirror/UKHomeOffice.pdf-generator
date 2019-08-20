@@ -3,21 +3,19 @@ import TYPE from '../constant/TYPE';
 import formTemplate from './formTemplate';
 import utils from 'formiojs/utils';
 import logger from '../util/logger';
-import Handlebars from 'handlebars';
+import ejs from 'ejs';
 
 @provide(TYPE.FormTemplateResolver)
 export class FormTemplateResolver {
 
     public async renderContentAsHtml(formSchema: object, submission: object): Promise<string> {
         const sanitizedFormSchema = this.sanitize(formSchema);
-        Handlebars.registerHelper('json', (context) => {
-            return JSON.stringify(context);
-        });
-        const content = Handlebars.compile(formTemplate);
-        const parsedContent = content({
+
+        const template = ejs.compile(formTemplate, {});
+        const parsedContent = template({
             formSchema: sanitizedFormSchema,
             submission,
-        }, {});
+        });
 
         return Promise.resolve(parsedContent);
     }
@@ -35,7 +33,10 @@ export class FormTemplateResolver {
             if (component.type === 'select') {
                 component.lazyLoad = false;
             }
-        });
+            if (component.type === 'panel') {
+                component.collapsed = false;
+            }
+        }, true);
         return formSchema;
     }
 }

@@ -13,6 +13,7 @@ describe('FormTemplateResolver', () => {
                 "textField": "This is a test of data"
             }
         });
+        console.log(result);
         expect(result).to.be.not.null;
     });
 });

@@ -11,6 +11,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
+import * as fs from "fs";
 
 @provide(TYPE.FormWizardPdfGenerator)
 export class FormWizardPdfGenerator extends PdfGenerator {
@@ -29,6 +30,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
         const formName = schema.name;
 
         const mergeMultiplePDF = (files: string[], finalFileName: string): Promise<string> => {
+
             return new Promise((resolve, reject) => {
                 const location: string = `/tmp/${finalFileName}`;
                 merge(files, location, (err) => {
@@ -65,6 +67,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 const htmlContent = await this.formTemplateResolver
                     .renderContentAsHtml(newSchema, formSubmission);
 
+
                 const page = await browser.newPage();
 
                 const tempFileName = `/tmp/${finalPdfName}-${index}`;
@@ -75,10 +78,10 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 logger.debug(result);
 
                 await page.goto(`file://${htmlFileName}`,
-                    {waitUntil: ['networkidle0', 'load', 'domcontentloaded']});
+                    {waitUntil: ['networkidle0', 'load', 'domcontentloaded'], timeout: 0});
 
-                await page.pdf({path: `${tempFileName}.pdf`, format: 'A4'});
-                logger.info(`Generated pdf for ${finalPdfName}`);
+                await page.pdf({path: `${tempFileName}.pdf`, format: 'A4' });
+                logger.info(`Generated pdf for ${tempFileName}.pdf`);
 
                 await this.deleteFile(htmlFileName);
                 if (page) {
