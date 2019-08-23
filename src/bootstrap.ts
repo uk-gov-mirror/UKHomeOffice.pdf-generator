@@ -13,6 +13,7 @@ import {EventEmitter} from 'events';
 import Arena from 'bull-arena';
 import Keycloak, {Token} from 'keycloak-connect';
 import session from 'express-session';
+import * as path from 'path';
 
 const applicationContext: ApplicationContext = new ApplicationContext();
 const container = applicationContext.iocContainer();

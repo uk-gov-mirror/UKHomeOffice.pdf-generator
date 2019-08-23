@@ -63,7 +63,7 @@ export class PdfProcessor {
         });
     }
 
-    async handlePdf(job: Job) : Promise<any> {
+    public async handlePdf(job: Job): Promise<any> {
         const schema = job.data.formSchema;
 
         const formSubmission = job.data.submission;
