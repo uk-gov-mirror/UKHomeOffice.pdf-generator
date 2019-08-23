@@ -10,6 +10,7 @@ import {FormWizardPdfGenerator} from '../pdf/FormWizardPdfGenerator';
 import {FormPdfGenerator} from '../pdf/FormPdfGenerator';
 import {KeycloakService} from '../service/KeycloakService';
 import {WebhookJob} from '../model/WebhookJob';
+import {ApplicationConstants} from '../constant/ApplicationConstants';
 
 @provide(TYPE.PdfProcessor)
 export class PdfProcessor {
@@ -35,17 +36,31 @@ export class PdfProcessor {
             });
             await job.remove();
         });
-        this.pdfQueue.on('failed', async (job) => {
-            logger.error(`PDF generation job failed`, {
-                cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
-                    jobId: job.id,
-                },
-            });
+        this.pdfQueue.on('failed', async (job, error) => {
+            if (job.attemptsMade < job.opts.attempts) {
+                logger.warn(`PDF generation failed..retrying. Retry ${job.attemptsMade} of ${job.opts.attempts}`
+                    , {
+                        cluster: {
+                            workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                            jobId: job.id,
+                        },
+                    });
+            } else {
+                logger.warn('Max retry reached. Marking this job as failed and notifying web-hook queue');
+                const success = new WebhookJob(job.data.webhookUrl, {
+                    event: ApplicationConstants.PDF_GENERATION_FAILED,
+                    data: {
+                        error: error.stack
+                    },
+                });
+                await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
+                logger.warn('Failed job notified via web-hook');
+            }
 
         });
-        this.pdfQueue.process(async (job: Job, done: any) => {
+        this.pdfQueue.process(async (job: Job) => {
             const schema = job.data.formSchema;
+
             const formSubmission = job.data.submission;
             const formName = schema.name;
             logger.info(`Initiating pdf generation of ${formName}`);
@@ -56,18 +71,16 @@ export class PdfProcessor {
                 } else {
                     result = await this.formPdfGenerator.generatePdf(schema, formSubmission);
                 }
-                const webHookJob = new WebhookJob(job.data.webhookUrl, {
-                        event: 'pdf-generated',
-                        data: {
-                            location: result.fileLocation,
-                        },
-                    })
-                ;
-                await this.webhookQueue.add(webHookJob, { attempts: 5, backoff: 5000 });
-                done(null, result);
-            } catch (err) {
-                logger.error('PDF generation failed', err);
-                done(err);
+                const success = new WebhookJob(job.data.webhookUrl, {
+                    event: ApplicationConstants.PDF_GENERATED_SUCCESS,
+                    data: {
+                        location: result.fileLocation,
+                    },
+                });
+                return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
+            } catch (error) {
+                logger.error('Failed to create pdf', error);
+                return Promise.reject(error);
             }
         });
     }

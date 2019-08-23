@@ -11,7 +11,6 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
-import * as fs from "fs";
 
 @provide(TYPE.FormWizardPdfGenerator)
 export class FormWizardPdfGenerator extends PdfGenerator {
@@ -66,7 +65,6 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 };
                 const htmlContent = await this.formTemplateResolver
                     .renderContentAsHtml(newSchema, formSubmission);
-
 
                 const page = await browser.newPage();
 
