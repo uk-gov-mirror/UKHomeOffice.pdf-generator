@@ -50,7 +50,7 @@ export class PdfProcessor {
                 const success = new WebhookJob(job.data.webhookUrl, {
                     event: ApplicationConstants.PDF_GENERATION_FAILED,
                     data: {
-                        error: error.stack
+                        error: error.stack,
                     },
                 });
                 await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
@@ -59,30 +59,34 @@ export class PdfProcessor {
 
         });
         this.pdfQueue.process(async (job: Job) => {
-            const schema = job.data.formSchema;
-
-            const formSubmission = job.data.submission;
-            const formName = schema.name;
-            logger.info(`Initiating pdf generation of ${formName}`);
-            try {
-                let result: { fileLocation: string, message: string } = null;
-                if (schema.display === 'wizard') {
-                    result = await this.formWizardPdfGenerator.generatePdf(schema, formSubmission);
-                } else {
-                    result = await this.formPdfGenerator.generatePdf(schema, formSubmission);
-                }
-                const success = new WebhookJob(job.data.webhookUrl, {
-                    event: ApplicationConstants.PDF_GENERATED_SUCCESS,
-                    data: {
-                        location: result.fileLocation,
-                    },
-                });
-                return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
-            } catch (error) {
-                logger.error('Failed to create pdf', error);
-                return Promise.reject(error);
-            }
+            return await this.handlePdf(job);
         });
+    }
+
+    async handlePdf(job: Job) : Promise<any> {
+        const schema = job.data.formSchema;
+
+        const formSubmission = job.data.submission;
+        const formName = schema.name;
+        logger.info(`Initiating pdf generation of ${formName}`);
+        try {
+            let result: { fileLocation: string, message: string } = null;
+            if (schema.display === 'wizard') {
+                result = await this.formWizardPdfGenerator.generatePdf(schema, formSubmission);
+            } else {
+                result = await this.formPdfGenerator.generatePdf(schema, formSubmission);
+            }
+            const success = new WebhookJob(job.data.webhookUrl, {
+                event: ApplicationConstants.PDF_GENERATED_SUCCESS,
+                data: {
+                    location: result.fileLocation,
+                },
+            });
+            return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
+        } catch (error) {
+            logger.error('Failed to create pdf', error);
+            return Promise.reject(error);
+        }
     }
 
 }
