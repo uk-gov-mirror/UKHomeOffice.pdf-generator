@@ -1,6 +1,5 @@
 import AppConfig from '../interfaces/AppConfig';
 import {ApplicationConstants} from '../constant/ApplicationConstants';
-import uuid4 from 'uuid';
 
 const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_PORT: number = 3000;
@@ -21,6 +20,7 @@ const {
     PDF_GENERATOR_AWS_S3_ACCESS_KEY,
     PDF_GENERATOR_AWS_S3_SECRET_KEY,
     PDF_GENERATOR_AWS_S3_PROTOCOL,
+    PDF_GENERATOR_AWS_S3_PORT,
     PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER,
     PDF_GENERATOR_ARENA_ACCESS_ROLES,
 } = process.env;
@@ -54,7 +54,7 @@ const defaultAppConfig: AppConfig = {
                 pdf: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME || 'pdf',
             },
             useSSL: true,
-            port: 9000,
+            port: +PDF_GENERATOR_AWS_S3_PORT,
             accessKey: PDF_GENERATOR_AWS_S3_ACCESS_KEY,
             secretKey: PDF_GENERATOR_AWS_S3_SECRET_KEY,
         },
