@@ -9,7 +9,6 @@ export class ConfigValidator {
         this.schema = Joi.object().keys({
             keycloak: Joi.object({
                 sessionSecret: Joi.string().required(),
-                protocol: Joi.string().required(),
                 uri: Joi.string().required(),
                 realm: Joi.string().required(),
                 client: Joi.object().keys({
@@ -25,6 +24,7 @@ export class ConfigValidator {
                 port: Joi.number(),
                 host: Joi.string(),
                 token: Joi.string(),
+                ssl: Joi.string(),
             }),
             correlationIdRequestHeader: Joi.string(),
             aws: Joi.object().optional().keys({
