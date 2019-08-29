@@ -44,7 +44,7 @@ const defaultAppConfig: AppConfig = {
         port: REDIS_PORT ? +REDIS_PORT : DEFAULT_REDIS_PORT,
         host: REDIS_URI || '127.0.0.1',
         token: REDIS_TOKEN,
-        ssl: REDIS_SSL || false,
+        ssl: REDIS_SSL ? REDIS_SSL === 'true' : false,
     },
     aws: {
         s3: {

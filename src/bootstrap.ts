@@ -62,7 +62,7 @@ const arenaConfig = Arena({
 
 const kcConfig = {
     'realm': appConfig.keycloak.realm,
-    'auth-server-url': `${appConfig.keycloak.protocol}${appConfig.keycloak.uri}`,
+    'auth-server-url': `${appConfig.keycloak.uri}`,
     'ssl-required': 'external',
     'bearer-only': false,
     'resource': appConfig.keycloak.client.id,

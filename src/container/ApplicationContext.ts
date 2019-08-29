@@ -32,6 +32,7 @@ export class ApplicationContext {
         this.container.bind<KeycloakService>(TYPE.KeycloakService).to(KeycloakService);
 
         const pdfRedisClient = createRedis(defaultAppConfig);
+
         const pdfQueue: Queue<PdfJob> = createQueue(pdfRedisClient,
             pdfRedisClient,
             pdfRedisClient,
@@ -39,6 +40,7 @@ export class ApplicationContext {
         this.container.bind<Queue>(TYPE.PDFQueue).toConstantValue(pdfQueue);
 
         const webhookRedisClient = createRedis(defaultAppConfig);
+
         const webhookQueue: Queue<PdfJob> = createQueue(webhookRedisClient,
             webhookRedisClient,
             webhookRedisClient,
