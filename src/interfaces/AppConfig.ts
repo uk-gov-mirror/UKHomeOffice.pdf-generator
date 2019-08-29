@@ -2,7 +2,6 @@ interface AppConfig {
     port: number;
     keycloak: {
         sessionSecret: string,
-        protocol: string,
         uri: string,
         realm: string,
         client: {
@@ -30,6 +29,7 @@ interface AppConfig {
         port: number,
         host: string,
         token: string,
+        ssl: boolean,
     };
     correlationIdRequestHeader: string;
 }
