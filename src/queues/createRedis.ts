@@ -9,13 +9,13 @@ const createRedis = (appConfig: AppConfig): IORedis.Redis => {
             host: appConfig.redis.host,
             password: appConfig.redis.token,
             tls: {
-            }
+            },
         });
     }
     return new Redis({
         port: appConfig.redis.port,
         host: appConfig.redis.host,
-        password: appConfig.redis.token
+        password: appConfig.redis.token,
     });
 
 };
