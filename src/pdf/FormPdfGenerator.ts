@@ -37,7 +37,7 @@ export class FormPdfGenerator extends PdfGenerator {
 
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--disable-web-security'],
+            args: ['--disable-web-security', '--no-sandbox'],
         });
 
         logger.debug('Opened browser for creating PDF');
