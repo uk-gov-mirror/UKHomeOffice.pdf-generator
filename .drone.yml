@@ -4,20 +4,10 @@ pipeline:
       image: node:11
       commands:
         - npm install
-        - npm run coverage
-        - npm run linter
+        - npm run test
       when:
         event:
         - push
-        - pull_request
-
-  sonar-scanner:
-    image: quay.io/ukhomeofficedigital/sonar-scanner:v3.0.1
-    when:
-      status:
-        - failure
-        - success
-      event:
         - pull_request
 
   build_push_to_ecr:
