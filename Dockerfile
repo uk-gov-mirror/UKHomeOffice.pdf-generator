@@ -4,22 +4,14 @@ COPY . /src
 
 WORKDIR /src
 
-
+RUN yum install -y libX11-devel libX11-common
 RUN npm install
 RUN npm run build-ts
 
-RUN npm prune --production
-
-FROM digitalpatterns/node:latest
-
-WORKDIR /app
-RUN mkdir -p /app
+#RUN npm prune --production
 
 
-COPY --from=build /src/node_modules node_modules
-COPY --from=build /src/dist dist
-
-RUN chown -R node:node /app
+RUN chown -R node:node /src
 
 ENV NODE_ENV='production'
 
