@@ -32,7 +32,7 @@ if (result.error) {
 }
 const basePath = ``;
 const expressApp: Application = express();
-
+console.log(JSON.stringify(appConfig));
 const arenaConfig = Arena({
         queues: [
             {
