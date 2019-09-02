@@ -9,7 +9,7 @@ const {
     KEYCLOAK_URI,
     PDF_GENERATOR_KEYCLOAK_CLIENT_ID,
     KEYCLOAK_REALM,
-    PDF_GENERATOR_KEYCLOAK_SECRET,
+    PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET,
     PDF_GENERATOR_KEYCLOAK_SESSION_SECRET,
     REDIS_PORT,
     REDIS_URI,
@@ -36,7 +36,7 @@ const defaultAppConfig: AppConfig = {
         uri: KEYCLOAK_URI || 'http://localhost:8080/auth',
         realm: KEYCLOAK_REALM || 'elf',
         client: {
-            secret: PDF_GENERATOR_KEYCLOAK_SECRET,
+            secret: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET,
             id: PDF_GENERATOR_KEYCLOAK_CLIENT_ID,
         },
     },
