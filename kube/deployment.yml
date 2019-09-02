@@ -17,8 +17,6 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
-      imagePullSecrets:
-        - name: "{{.DOCKER_CREDENTIALS}}"
       containers:
       - name: proxy
         image: "{{.NGINX_IMAGE}}:{{.NGINX_TAG}}"
@@ -80,6 +78,11 @@ spec:
               secretKeyRef:
                 name: "{{.PDF_GENERATOR_NAME}}"
                 key: keycloakClientSecret
+          - name: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{.PDF_GENERATOR_NAME}}"
+                key: keycloakSessionSecret
           - name: PDF_GENERATOR_PORT
             value: "{{.PDF_GENERATOR_PORT}}"
           - name: PDF_GENERATOR_LOG_LEVEL

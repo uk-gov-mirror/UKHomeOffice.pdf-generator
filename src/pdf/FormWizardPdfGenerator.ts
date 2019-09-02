@@ -48,7 +48,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--disable-web-security'],
+            args: ['--disable-web-security', '--no-sandbox'],
         });
         let pdfFiles = [];
         let fileLocation: string = null;
