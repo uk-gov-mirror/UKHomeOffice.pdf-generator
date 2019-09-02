@@ -81,7 +81,7 @@ export class PdfProcessor {
                 data: {
                     location: result.fileLocation,
                     etag: result.etag,
-                    fileName: result.fileName
+                    fileName: result.fileName,
                 },
             });
             return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});

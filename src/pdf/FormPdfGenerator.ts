@@ -23,7 +23,7 @@ export class FormPdfGenerator extends PdfGenerator {
         fileLocation: string,
         message: string,
         etag: string,
-        fileName: string
+        fileName: string,
     }> {
         logger.info('Generating pdf for form');
         const formName = schema.name;

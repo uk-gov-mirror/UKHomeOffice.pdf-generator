@@ -45,8 +45,8 @@ export class S3Service {
                             etag,
                         });
                         resolve({
-                            location:`${this.s3Url}/${objectName}`,
-                            etag: etag
+                            location: `${this.s3Url}/${objectName}`,
+                            etag,
                         });
                     }
                 });
@@ -68,8 +68,8 @@ export class S3Service {
                             etag,
                         });
                         resolve({
-                            location:`${this.s3Url}/${objectName}`,
-                            etag: etag
+                            location: `${this.s3Url}/${objectName}`,
+                            etag,
                         });
                     }
                 });

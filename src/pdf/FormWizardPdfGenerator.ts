@@ -26,7 +26,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
         fileLocation: string,
         message: string,
         etag: string,
-        fileName: string
+        fileName: string,
     }> {
         const formName = schema.name;
 
