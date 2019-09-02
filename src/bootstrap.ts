@@ -13,7 +13,6 @@ import {EventEmitter} from 'events';
 import Arena from 'bull-arena';
 import Keycloak, {Token} from 'keycloak-connect';
 import session from 'express-session';
-import * as path from 'path';
 
 const applicationContext: ApplicationContext = new ApplicationContext();
 const container = applicationContext.iocContainer();
@@ -33,25 +32,33 @@ if (result.error) {
 const basePath = ``;
 const expressApp: Application = express();
 
+let redisConfig;
+if (appConfig.redis.ssl) {
+    redisConfig = {
+        port: appConfig.redis.port,
+        host: appConfig.redis.host,
+        password: appConfig.redis.token,
+        tls: {},
+    };
+} else {
+    redisConfig = {
+        port: appConfig.redis.port,
+        host: appConfig.redis.host,
+        password: appConfig.redis.token,
+    };
+}
+
 const arenaConfig = Arena({
         queues: [
             {
                 name: ApplicationConstants.PDF_QUEUE_NAME,
                 hostId: 'PDFGeneratorQueues',
-                redis: {
-                    port: appConfig.redis.port,
-                    host: appConfig.redis.host,
-                    password: appConfig.redis.token,
-                },
+                redis: redisConfig,
             },
             {
                 name: ApplicationConstants.WEB_HOOK_POST_QUEUE_NAME,
                 hostId: 'Web-HookQueues',
-                redis: {
-                    port: appConfig.redis.port,
-                    host: appConfig.redis.host,
-                    password: appConfig.redis.token,
-                },
+                redis: redisConfig,
             },
         ],
     },
