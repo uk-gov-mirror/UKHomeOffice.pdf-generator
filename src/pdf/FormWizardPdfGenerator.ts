@@ -25,6 +25,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
     public async generatePdf(schema: any, formSubmission: any): Promise<{
         fileLocation: string,
         message: string,
+        etag: string,
     }> {
         const formName = schema.name;
 
@@ -102,7 +103,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             logger.debug(`S3 etag ${s3Location}`);
 
             return {
-                fileLocation: s3Location,
+                fileLocation: s3Location.location,
+                etag: s3Location.etag,
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
         } catch (e) {

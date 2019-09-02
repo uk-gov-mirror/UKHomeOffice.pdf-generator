@@ -33,7 +33,7 @@ export class S3Service {
     public async upload(bucketName: string,
                         file: Buffer,
                         objectName: string,
-                        metaData?: object): Promise<string> {
+                        metaData?: object): Promise<{location, etag}> {
         return new Promise((resolve, reject) => {
             this.minioClient.putObject(bucketName, objectName, file, file.length,
                 metaData,
@@ -44,7 +44,10 @@ export class S3Service {
                         logger.info(`Successfully ${objectName} uploaded to S3`, {
                             etag,
                         });
-                        resolve(`${this.s3Url}/${objectName}`);
+                        resolve({
+                            location:`${this.s3Url}/${objectName}`,
+                            etag: etag
+                        });
                     }
                 });
         });
@@ -53,7 +56,7 @@ export class S3Service {
     public async uploadFile(bucketName: string,
                             filePath: string,
                             objectName: string,
-                            metaData?: object): Promise<string> {
+                            metaData?: object): Promise<{location, etag}> {
         return new Promise((resolve, reject) => {
             this.minioClient.fPutObject(bucketName, objectName, filePath,
                 metaData,
@@ -64,7 +67,10 @@ export class S3Service {
                         logger.info(`Successfully ${objectName} uploaded to S3`, {
                             etag,
                         });
-                        resolve(`${this.s3Url}/${objectName}`);
+                        resolve({
+                            location:`${this.s3Url}/${objectName}`,
+                            etag: etag
+                        });
                     }
                 });
         });

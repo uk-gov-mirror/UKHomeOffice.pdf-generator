@@ -22,6 +22,7 @@ export class FormPdfGenerator extends PdfGenerator {
     public async generatePdf(schema: any, formSubmission: any): Promise<{
         fileLocation: string,
         message: string,
+        etag: string
     }> {
         logger.info('Generating pdf for form');
         const formName = schema.name;
@@ -57,7 +58,8 @@ export class FormPdfGenerator extends PdfGenerator {
             logger.info(`File location ${fileLocation}`);
 
             return {
-                fileLocation,
+                fileLocation: fileLocation.location,
+                etag: fileLocation.etag,
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
 
