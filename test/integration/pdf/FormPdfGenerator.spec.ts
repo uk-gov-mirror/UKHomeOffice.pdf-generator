@@ -32,7 +32,8 @@ describe('FormPdfGenerator', () => {
         // @ts-ignore
         s3Service.upload(Arg.any(), Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
             location: 'test',
-            etag: 'etag'
+            etag: 'etag',
+            fileName: 'fileName'
         }));
 
         const result = await formPdfGenerator.generatePdf(formSchema, submission);

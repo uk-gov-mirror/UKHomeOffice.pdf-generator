@@ -70,7 +70,7 @@ export class PdfProcessor {
         const formName = schema.name;
         logger.info(`Initiating pdf generation of ${formName}`);
         try {
-            let result: { fileLocation: string, message: string, etag: string} = null;
+            let result: { fileLocation: string, message: string, etag: string, fileName: string} = null;
             if (schema.display === 'wizard') {
                 result = await this.formWizardPdfGenerator.generatePdf(schema, formSubmission);
             } else {
@@ -80,7 +80,8 @@ export class PdfProcessor {
                 event: ApplicationConstants.PDF_GENERATED_SUCCESS,
                 data: {
                     location: result.fileLocation,
-                    etag: result.etag
+                    etag: result.etag,
+                    fileName: result.fileName
                 },
             });
             return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});

@@ -31,7 +31,7 @@ export abstract class PdfGenerator {
     }
 
     public abstract async generatePdf(schema: any, formSubmission: any):
-        Promise<{ fileLocation: string, message: string, etag: string}>;
+        Promise<{ fileLocation: string, message: string, etag: string, fileName: string}>;
 
     protected finalPdfName(submission: any, schema: any): string {
         return submission.data.businessKey ?
