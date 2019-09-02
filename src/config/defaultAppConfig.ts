@@ -42,7 +42,7 @@ const defaultAppConfig: AppConfig = {
     },
     redis: {
         port: REDIS_PORT ? +REDIS_PORT : DEFAULT_REDIS_PORT,
-        host: REDIS_URI || '127.0.0.1',
+        host: REDIS_URI,
         token: REDIS_TOKEN,
         ssl: REDIS_SSL ? REDIS_SSL === 'true' : false,
     },
