@@ -124,7 +124,7 @@ process.on('SIGINT', async () => {
 
 process.on('unhandledRejection', (reason: Error, promise: Promise<any>) => {
     logger.error('unhandledRejection', {
-        exception: reason.message,
+        exception: reason.stack,
     });
 });
 
