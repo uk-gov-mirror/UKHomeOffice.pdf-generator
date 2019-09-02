@@ -32,7 +32,11 @@ describe('FormWizardPdfGenerator', () => {
         };
 
         const id = 'id';
-        s3Service.uploadFile(Arg.any(), Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve(id));
+        s3Service.uploadFile(Arg.any(), Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
+            location: id,
+            etag: 'etag',
+            fileName: 'fileName'
+        }));
 
         const result = await formWizardPdfGenerator.generatePdf(formSchema, submission);
 

@@ -25,6 +25,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
     public async generatePdf(schema: any, formSubmission: any): Promise<{
         fileLocation: string,
         message: string,
+        etag: string,
+        fileName: string,
     }> {
         const formName = schema.name;
 
@@ -78,7 +80,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 await page.goto(`file://${htmlFileName}`,
                     {waitUntil: ['networkidle0', 'load', 'domcontentloaded'], timeout: 0});
 
-                await page.pdf({path: `${tempFileName}.pdf`, format: 'A4' });
+                await page.pdf({path: `${tempFileName}.pdf`, format: 'A4'});
                 logger.info(`Generated pdf for ${tempFileName}.pdf`);
 
                 await this.deleteFile(htmlFileName);
@@ -97,12 +99,15 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             fileLocation = await mergeMultiplePDF(pdfFiles, formName);
             logger.info(`Merge completed for ${finalPdfName}`);
 
+            const finalFileName = `${finalPdfName}.pdf`;
             const s3Location = await this.s3Service.uploadFile(this.bucketName, fileLocation,
-                `${finalPdfName}.pdf`, this.pdfMetaData);
+                finalFileName, this.pdfMetaData);
             logger.debug(`S3 etag ${s3Location}`);
 
             return {
-                fileLocation: s3Location,
+                fileName: finalFileName,
+                fileLocation: s3Location.location,
+                etag: s3Location.etag,
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
         } catch (e) {

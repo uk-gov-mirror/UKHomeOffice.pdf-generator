@@ -1,23 +1,30 @@
-import Redis from 'ioredis';
 import AppConfig from '../interfaces/AppConfig';
-import IORedis from 'ioredis';
+import * as Redis from 'redis';
+import logger from "../util/logger";
 
-const createRedis = (appConfig: AppConfig): IORedis.Redis => {
+const redis = (appConfig: AppConfig): Redis.RedisClient => {
+    let redisClient;
     if (appConfig.redis.ssl) {
-        return new Redis({
+        redisClient = Redis.createClient({
             port: appConfig.redis.port,
-            host: appConfig.redis.host,
+            host: appConfig.redis.token,
             password: appConfig.redis.token,
-            tls: {
-            },
+            tls: {},
+        });
+    } else {
+        redisClient = Redis.createClient({
+            port: appConfig.redis.port,
+            host: appConfig.redis.token,
+            password: appConfig.redis.token,
         });
     }
-    return new Redis({
-        port: appConfig.redis.port,
-        host: appConfig.redis.host,
-        password: appConfig.redis.token,
+
+    redisClient.on('error', (error) => {
+        logger.error(`Could not connect to redis due to [${error.message}]`);
     });
+
+    return redisClient;
 
 };
 
-export default createRedis;
+export default redis;

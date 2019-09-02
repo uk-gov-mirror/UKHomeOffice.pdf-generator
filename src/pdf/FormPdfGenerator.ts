@@ -22,6 +22,8 @@ export class FormPdfGenerator extends PdfGenerator {
     public async generatePdf(schema: any, formSubmission: any): Promise<{
         fileLocation: string,
         message: string,
+        etag: string,
+        fileName: string,
     }> {
         logger.info('Generating pdf for form');
         const formName = schema.name;
@@ -51,13 +53,16 @@ export class FormPdfGenerator extends PdfGenerator {
 
             logger.info(`PDF generated for ${formName}...now uploading to file store.`);
 
-            const fileLocation = await this.s3Service.upload(this.bucketName, pdf, `${finalPdfName}.pdf`,
+            const finalFileName = `${finalPdfName}.pdf`;
+            const fileLocation = await this.s3Service.upload(this.bucketName, pdf, finalFileName,
                 this.pdfMetaData);
 
             logger.info(`File location ${fileLocation}`);
 
             return {
-                fileLocation,
+                fileName: finalFileName,
+                fileLocation: fileLocation.location,
+                etag: fileLocation.etag,
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
 

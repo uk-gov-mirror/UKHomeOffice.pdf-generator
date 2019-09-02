@@ -57,7 +57,9 @@ describe('PDFProcessor', () => {
 
         formPdfGenerator.generatePdf(Arg.any(), Arg.any()).returns(Promise.resolve({
             message: 'test',
-            fileLocation: 'fileLocation'
+            fileLocation: 'fileLocation',
+            etag: 'etag',
+            fileName: 'fileName'
         }));
 
         const webhookJob: SubstituteOf<Job<WebhookJob>> = Substitute.for<Job<WebhookJob>>();
@@ -89,7 +91,9 @@ describe('PDFProcessor', () => {
 
         formWizardPdfGenerator.generatePdf(Arg.any(), Arg.any()).returns(Promise.resolve({
             message: 'test',
-            fileLocation: 'fileLocation'
+            fileLocation: 'fileLocation',
+            etag: 'etag',
+            fileName: 'fileName'
         }));
 
         const webhookJob: SubstituteOf<Job<WebhookJob>> = Substitute.for<Job<WebhookJob>>();
