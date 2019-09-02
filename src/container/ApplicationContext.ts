@@ -63,10 +63,6 @@ export class ApplicationContext {
         eventEmitter.on(ApplicationConstants.SHUTDOWN_EVENT, () => {
             this.container.unbindAll();
 
-            pdfRedisClient.disconnect();
-            webhookRedisClient.disconnect();
-            logger.info('Disconnected redis clients');
-
             pdfQueue.close().then(() => {
                 logger.info('Closed pdf queue');
             }).catch((err) => {
