@@ -19,7 +19,8 @@ interface AppConfig {
             useSSL: boolean,
             port: number,
             accessKey: string,
-            secretKey: string
+            secretKey: string,
+            region: string,
             buckets: {
                 pdf: string,
             },
