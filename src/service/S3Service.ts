@@ -3,7 +3,7 @@ import TYPE from '../constant/TYPE';
 import {inject} from 'inversify';
 import AppConfig from '../interfaces/AppConfig';
 import logger from '../util/logger';
-import * as fs from "fs";
+import * as fs from 'fs';
 import S3 from 'aws-sdk/clients/s3';
 
 @provide(TYPE.S3Service)
@@ -16,13 +16,12 @@ export class S3Service {
         accessKey: string,
         secretKey: string,
         kmsKey: string,
-        region: string
+        region: string,
     };
 
     constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig,
                 @inject(TYPE.S3) private readonly s3: S3) {
         this.s3Config = this.appConfig.aws.s3;
-
 
         this.s3Url = this.appConfig.aws.s3.protocol +
             this.appConfig.aws.s3.endpoint + '/' + this.appConfig.aws.s3.buckets.pdf;
@@ -33,14 +32,13 @@ export class S3Service {
                         file: Buffer,
                         objectName: string): Promise<{ location, etag }> {
 
-
         const params = {
             Bucket: bucketName,
             Key: objectName,
             Body: file,
             ContentType: 'application/pdf',
             ServerSideEncryption: 'aws:kms',
-            SSEKMSKeyId: this.s3Config.kmsKey
+            SSEKMSKeyId: this.s3Config.kmsKey,
         };
 
         return this.uploadToS3(params);
@@ -56,7 +54,7 @@ export class S3Service {
             Body: fs.readFileSync(filePath),
             ContentType: 'application/pdf',
             ServerSideEncryption: 'aws:kms',
-            SSEKMSKeyId: this.s3Config.kmsKey
+            SSEKMSKeyId: this.s3Config.kmsKey,
         };
 
         return this.uploadToS3(params);
@@ -74,7 +72,7 @@ export class S3Service {
                     });
                     resolve({
                         location: `${this.s3Url}/${params.Key}`,
-                        etag: etag,
+                        etag,
                     });
                 }
             });

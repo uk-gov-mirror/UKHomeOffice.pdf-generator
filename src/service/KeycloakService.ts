@@ -4,7 +4,7 @@ import {inject} from 'inversify';
 import AppConfig from '../interfaces/AppConfig';
 import * as querystring from 'querystring';
 import axiosInstance from '../util/axios';
-import logger from "../util/logger"
+import logger from '../util/logger';
 import HttpStatus from 'http-status-codes';
 
 @provide(TYPE.KeycloakService)
@@ -32,7 +32,7 @@ export class KeycloakService {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                data: data,
+                data,
             });
             if (tokenResponse.status !== HttpStatus.OK) {
                 return Promise.reject('Failed to get access token');

@@ -12,5 +12,5 @@ export default {
   PdfGenerator: Symbol.for('PdfGenerator'),
   WebhookPostQueue: Symbol.for('WebhookPostQueue'),
   WebhookProcessor: Symbol.for('WebhookProcessor'),
-  S3: Symbol.for('S3')
+  S3: Symbol.for('S3'),
 };

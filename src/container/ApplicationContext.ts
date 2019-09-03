@@ -15,7 +15,7 @@ import {S3Service} from '../service/S3Service';
 import {KeycloakService} from '../service/KeycloakService';
 import {WebhookProcessor} from '../processors/WebhookProcessor';
 import createQueue from '../queues/createQueue';
-import S3 = require("aws-sdk/clients/s3");
+import S3 = require('aws-sdk/clients/s3');
 
 export class ApplicationContext {
     private readonly container: Container;
@@ -45,12 +45,11 @@ export class ApplicationContext {
         this.container.bind<FormWizardPdfGenerator>(TYPE.FormWizardPdfGenerator).to(FormWizardPdfGenerator);
         this.container.bind<FormPdfGenerator>(TYPE.FormPdfGenerator).to(FormPdfGenerator);
 
-
         const s3Config = defaultAppConfig.aws.s3;
         const s3 = new S3({
             accessKeyId: s3Config.accessKey,
             secretAccessKey: s3Config.secretKey,
-            region: s3Config.region
+            region: s3Config.region,
         });
 
         this.container.bind<S3>(TYPE.S3).toConstantValue(s3);
@@ -59,7 +58,6 @@ export class ApplicationContext {
 
         this.container.get(TYPE.PdfProcessor);
         this.container.get(TYPE.WebhookProcessor);
-
 
         logger.info('Application context initialised');
 

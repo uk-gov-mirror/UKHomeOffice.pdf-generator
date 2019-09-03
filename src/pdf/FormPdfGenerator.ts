@@ -8,7 +8,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
-import * as fs from "fs";
+import * as fs from 'fs';
 
 @provide(TYPE.FormPdfGenerator)
 export class FormPdfGenerator extends PdfGenerator {
