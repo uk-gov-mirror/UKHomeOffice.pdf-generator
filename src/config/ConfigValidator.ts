@@ -35,6 +35,7 @@ export class ConfigValidator {
                     port: Joi.number().optional(),
                     accessKey: Joi.string().optional(),
                     secretKey: Joi.string().optional(),
+                    region: Joi.string().optional(),
                     buckets: Joi.object().optional().keys({
                         pdf: Joi.string().optional(),
                     }),

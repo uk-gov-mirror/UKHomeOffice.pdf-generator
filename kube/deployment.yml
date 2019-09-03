@@ -97,6 +97,8 @@ spec:
             value: "{{.PDF_GENERATOR_AWS_S3_PORT}}"
           - name: PDF_GENERATOR_AWS_S3_PROTOCOL
             value: "{{.PDF_GENERATOR_AWS_S3_PROTOCOL}}"
+          - name: PDF_GENERATOR_AWS_S3_REGION
+            value: "{{.PDF_GENERATOR_AWS_S3_REGION}}"
           - name: PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
             value: "{{.PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER}}"
           - name: PDF_GENERATOR_AWS_S3_SECRET_KEY

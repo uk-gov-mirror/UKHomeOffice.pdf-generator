@@ -21,6 +21,7 @@ const {
     PDF_GENERATOR_AWS_S3_SECRET_KEY,
     PDF_GENERATOR_AWS_S3_PROTOCOL,
     PDF_GENERATOR_AWS_S3_PORT,
+    PDF_GENERATOR_AWS_S3_REGION,
     PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER,
     PDF_GENERATOR_ARENA_ACCESS_ROLES,
 } = process.env;
@@ -53,6 +54,7 @@ const defaultAppConfig: AppConfig = {
             buckets: {
                 pdf: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME || 'pdf',
             },
+            region: PDF_GENERATOR_AWS_S3_REGION || '',
             useSSL: true,
             port: +PDF_GENERATOR_AWS_S3_PORT,
             accessKey: PDF_GENERATOR_AWS_S3_ACCESS_KEY,
