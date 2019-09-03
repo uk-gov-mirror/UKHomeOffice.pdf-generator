@@ -17,6 +17,7 @@ export class S3Service {
             port: number,
             accessKey: string,
             secretKey: string,
+            region: string,
         } = this.appConfig.aws.s3;
         this.minioClient = new Client({
             endPoint: s3.endpoint,
@@ -24,6 +25,7 @@ export class S3Service {
             port: s3.port,
             accessKey: s3.accessKey,
             secretKey: s3.secretKey,
+            region: s3.region,
         });
         this.s3Url = this.appConfig.aws.s3.protocol +
             this.appConfig.aws.s3.endpoint + '/' + this.appConfig.aws.s3.buckets.pdf;
