@@ -66,13 +66,13 @@ export class S3Service {
                 if (err) {
                     reject(err);
                 } else {
-                    const etag = JSON.parse(data.ETag);
+                    const etag = data.ETag.replace(/(^"|"$)/g, '');
                     logger.info(`Successfully ${params.Key} uploaded to S3`, {
                         etag,
                     });
                     resolve({
                         location: `${this.s3Url}/${params.Key}`,
-                        etag,
+                        etag: etag,
                     });
                 }
             });
