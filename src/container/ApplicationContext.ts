@@ -14,7 +14,6 @@ import {ApplicationConstants} from '../constant/ApplicationConstants';
 import {S3Service} from '../service/S3Service';
 import {KeycloakService} from '../service/KeycloakService';
 import {WebhookProcessor} from '../processors/WebhookProcessor';
-import createRedis from '../queues/createRedis';
 import createQueue from '../queues/createQueue';
 
 export class ApplicationContext {
@@ -31,19 +30,10 @@ export class ApplicationContext {
         this.container.bind<FormTemplateResolver>(TYPE.FormTemplateResolver).to(FormTemplateResolver);
         this.container.bind<KeycloakService>(TYPE.KeycloakService).to(KeycloakService);
 
-        const pdfRedisClient = createRedis(defaultAppConfig);
-
-        const pdfQueue: Queue<PdfJob> = createQueue(pdfRedisClient,
-            pdfRedisClient,
-            pdfRedisClient,
-            ApplicationConstants.PDF_QUEUE_NAME);
+        const pdfQueue: Queue<PdfJob> = createQueue(defaultAppConfig, ApplicationConstants.PDF_QUEUE_NAME);
         this.container.bind<Queue>(TYPE.PDFQueue).toConstantValue(pdfQueue);
 
-        const webhookRedisClient = createRedis(defaultAppConfig);
-
-        const webhookQueue: Queue<PdfJob> = createQueue(webhookRedisClient,
-            webhookRedisClient,
-            webhookRedisClient,
+        const webhookQueue: Queue<PdfJob> = createQueue(defaultAppConfig,
             ApplicationConstants.WEB_HOOK_POST_QUEUE_NAME);
 
         this.container.bind<Queue>(TYPE.WebhookPostQueue).toConstantValue(webhookQueue);

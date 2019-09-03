@@ -1,26 +1,26 @@
 import Bull, {Queue} from 'bull';
-import {RedisClient} from 'redis';
+import AppConfig from '../interfaces/AppConfig';
 
-const createQueue = (client: RedisClient,
-                     subscriber: RedisClient,
-                     defaultClient: RedisClient,
+const createQueue = (appConfig: AppConfig,
                      name: string): Queue => {
-    const opts: { redis: object } = {
-        redis: {
-            opts: {
-                createClient(type) {
-                    switch (type) {
-                        case 'client':
-                            return client;
-                        case 'subscriber':
-                            return subscriber;
-                        default:
-                            return defaultClient;
-                    }
-                },
+
+    if (appConfig.redis.ssl) {
+        return new Bull(name, {
+            redis: {
+                port: appConfig.redis.port,
+                host: appConfig.redis.host,
+                password: appConfig.redis.token,
+                tls: {},
             },
+        });
+    }
+    return new Bull(name, {
+        redis: {
+            port: appConfig.redis.port,
+            host: appConfig.redis.host,
+            password: appConfig.redis.token,
+
         },
-    };
-    return new Bull(name, opts);
+    });
 };
 export default createQueue;

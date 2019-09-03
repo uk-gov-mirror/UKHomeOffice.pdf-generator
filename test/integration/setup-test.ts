@@ -7,12 +7,9 @@ import {Queue} from "bull";
 import {PdfJob} from "../../src/model/PdfJob";
 
 import * as createQueueModule from "../../src/queues/createQueue";
-import * as redisFunction from '../../src/queues/createRedis';
 import {ImportMock} from 'ts-mock-imports';
 import {Substitute} from "@fluffy-spoon/substitute";
-import MockRedis from 'ioredis-mock';
 
-ImportMock.mockFunction(redisFunction, "default", new MockRedis());
 ImportMock.mockFunction(createQueueModule, "default", Substitute.for<Queue>());
 
 export const applicationContext: ApplicationContext = new ApplicationContext();
