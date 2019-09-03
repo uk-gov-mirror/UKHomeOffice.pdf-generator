@@ -72,7 +72,7 @@ export class S3Service {
                     });
                     resolve({
                         location: `${this.s3Url}/${params.Key}`,
-                        etag: etag,
+                        etag,
                     });
                 }
             });
