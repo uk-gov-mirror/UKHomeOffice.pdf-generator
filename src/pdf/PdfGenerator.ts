@@ -16,10 +16,6 @@ export abstract class PdfGenerator {
 
     protected readonly s3Service: S3Service;
 
-    protected pdfMetaData: object = {
-        'Content-Type': 'application/pdf',
-    };
-
     protected constructor(appConfig: AppConfig,
                           formTemplateResolver: FormTemplateResolver,
                           s3Service: S3Service) {

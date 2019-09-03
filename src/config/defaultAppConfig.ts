@@ -17,6 +17,7 @@ const {
     REDIS_SSL,
     PDF_GENERATOR_AWS_S3_ENDPOINT,
     PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME,
+    PDF_GENERATOR_AWS_S3_KMS_KEY,
     PDF_GENERATOR_AWS_S3_ACCESS_KEY,
     PDF_GENERATOR_AWS_S3_SECRET_KEY,
     PDF_GENERATOR_AWS_S3_PROTOCOL,
@@ -51,6 +52,7 @@ const defaultAppConfig: AppConfig = {
         s3: {
             protocol: PDF_GENERATOR_AWS_S3_PROTOCOL || 'https://',
             endpoint: PDF_GENERATOR_AWS_S3_ENDPOINT || '127.0.0.1',
+            kmsKey: PDF_GENERATOR_AWS_S3_KMS_KEY,
             buckets: {
                 pdf: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME || 'pdf',
             },

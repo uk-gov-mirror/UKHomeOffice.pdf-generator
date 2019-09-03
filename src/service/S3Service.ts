@@ -2,31 +2,28 @@ import {provide} from 'inversify-binding-decorators';
 import TYPE from '../constant/TYPE';
 import {inject} from 'inversify';
 import AppConfig from '../interfaces/AppConfig';
-import {Client} from 'minio';
 import logger from '../util/logger';
+import * as fs from "fs";
+import S3 from 'aws-sdk/clients/s3';
 
 @provide(TYPE.S3Service)
 export class S3Service {
-    private readonly minioClient: Client;
     private readonly s3Url: string;
+    private readonly s3Config: {
+        endpoint: string,
+        useSSL: boolean,
+        port: number,
+        accessKey: string,
+        secretKey: string,
+        kmsKey: string,
+        region: string
+    };
 
-    constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig) {
-        const s3: {
-            endpoint: string,
-            useSSL: boolean,
-            port: number,
-            accessKey: string,
-            secretKey: string,
-            region: string,
-        } = this.appConfig.aws.s3;
-        this.minioClient = new Client({
-            endPoint: s3.endpoint,
-            useSSL: s3.useSSL,
-            port: s3.port,
-            accessKey: s3.accessKey,
-            secretKey: s3.secretKey,
-            region: s3.region,
-        });
+    constructor(@inject(TYPE.AppConfig) private readonly appConfig: AppConfig,
+                @inject(TYPE.S3) private readonly s3: S3) {
+        this.s3Config = this.appConfig.aws.s3;
+
+
         this.s3Url = this.appConfig.aws.s3.protocol +
             this.appConfig.aws.s3.endpoint + '/' + this.appConfig.aws.s3.buckets.pdf;
 
@@ -34,48 +31,53 @@ export class S3Service {
 
     public async upload(bucketName: string,
                         file: Buffer,
-                        objectName: string,
-                        metaData?: object): Promise<{location, etag}> {
-        return new Promise((resolve, reject) => {
-            this.minioClient.putObject(bucketName, objectName, file, file.length,
-                metaData,
-                (err, etag) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        logger.info(`Successfully ${objectName} uploaded to S3`, {
-                            etag,
-                        });
-                        resolve({
-                            location: `${this.s3Url}/${objectName}`,
-                            etag,
-                        });
-                    }
-                });
-        });
+                        objectName: string): Promise<{ location, etag }> {
+
+
+        const params = {
+            Bucket: bucketName,
+            Key: objectName,
+            Body: file,
+            ContentType: 'application/pdf',
+            ServerSideEncryption: 'aws:kms',
+            SSEKMSKeyId: this.s3Config.kmsKey
+        };
+
+        return this.uploadToS3(params);
     }
 
     public async uploadFile(bucketName: string,
                             filePath: string,
-                            objectName: string,
-                            metaData?: object): Promise<{location, etag}> {
-        return new Promise((resolve, reject) => {
-            this.minioClient.fPutObject(bucketName, objectName, filePath,
-                metaData,
-                (err, etag) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        logger.info(`Successfully ${objectName} uploaded to S3`, {
-                            etag,
-                        });
-                        resolve({
-                            location: `${this.s3Url}/${objectName}`,
-                            etag,
-                        });
-                    }
-                });
-        });
+                            objectName: string): Promise<{ location, etag }> {
+
+        const params = {
+            Bucket: bucketName,
+            Key: objectName,
+            Body: fs.readFileSync(filePath),
+            ContentType: 'application/pdf',
+            ServerSideEncryption: 'aws:kms',
+            SSEKMSKeyId: this.s3Config.kmsKey
+        };
+
+        return this.uploadToS3(params);
     }
 
+    private uploadToS3(params): Promise<{ location, etag }> {
+        return new Promise((resolve, reject) => {
+            this.s3.putObject(params, (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const etag = JSON.parse(data.ETag);
+                    logger.info(`Successfully ${params.Key} uploaded to S3`, {
+                        etag,
+                    });
+                    resolve({
+                        location: `${this.s3Url}/${params.Key}`,
+                        etag: etag,
+                    });
+                }
+            });
+        });
+    }
 }

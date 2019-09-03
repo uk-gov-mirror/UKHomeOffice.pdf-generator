@@ -8,6 +8,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
+import * as fs from "fs";
 
 @provide(TYPE.FormPdfGenerator)
 export class FormPdfGenerator extends PdfGenerator {
@@ -54,15 +55,15 @@ export class FormPdfGenerator extends PdfGenerator {
             logger.info(`PDF generated for ${formName}...now uploading to file store.`);
 
             const finalFileName = `${finalPdfName}.pdf`;
-            const fileLocation = await this.s3Service.upload(this.bucketName, pdf, finalFileName,
-                this.pdfMetaData);
 
-            logger.info(`File location ${fileLocation}`);
+            const response = await this.s3Service.upload(this.bucketName, pdf, finalFileName);
+
+            logger.info(`File location ${JSON.stringify(response)}`);
 
             return {
                 fileName: finalFileName,
-                fileLocation: fileLocation.location,
-                etag: fileLocation.etag,
+                fileLocation: response.location,
+                etag: response.etag,
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
 

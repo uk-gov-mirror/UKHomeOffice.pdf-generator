@@ -34,8 +34,10 @@ export class WebhookProcessor {
             await job.remove();
         });
         this.webhookQueue.on('failed', async (job: Job, error: Error) => {
+
             if (job.attemptsMade < job.opts.attempts) {
                 logger.warn(`Web-hook post failed...retrying`, {
+                    error: error.stack,
                     cluster: {
                         workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                         jobId: job.id,
@@ -43,12 +45,13 @@ export class WebhookProcessor {
                 });
             } else {
                 logger.error(`Web-hook job failed for ${job.data.url} after max retries.`,
-                    {error: error.message});
+                    {error: error.stack});
             }
         });
         this.webhookQueue.process(async (job: Job) => {
             const webhookJob: WebhookJob = job.data;
             const accessToken = await this.kecycloakService.getAccessToken();
+
             try {
                 logger.info(`Sending web-hook notification for pdf generated`);
                 const response = await axiosInstance.post(webhookJob.url, webhookJob.payload, {
@@ -56,7 +59,6 @@ export class WebhookProcessor {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 });
-
                 const responseStatus = response.status;
                 if (responseStatus === HttpStatus.OK || responseStatus === HttpStatus.ACCEPTED) {
                     return Promise.resolve({

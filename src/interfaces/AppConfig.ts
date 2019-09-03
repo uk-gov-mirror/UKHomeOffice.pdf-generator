@@ -21,6 +21,7 @@ interface AppConfig {
             accessKey: string,
             secretKey: string,
             region: string,
+            kmsKey: string,
             buckets: {
                 pdf: string,
             },

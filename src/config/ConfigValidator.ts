@@ -33,6 +33,7 @@ export class ConfigValidator {
                     endpoint: Joi.string().optional(),
                     useSSL: Joi.boolean().optional(),
                     port: Joi.number().optional(),
+                    kmsKey: Joi.string(),
                     accessKey: Joi.string().optional(),
                     secretKey: Joi.string().optional(),
                     region: Joi.string().optional(),

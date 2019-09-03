@@ -32,7 +32,7 @@ describe('FormWizardPdfGenerator', () => {
         };
 
         const id = 'id';
-        s3Service.uploadFile(Arg.any(), Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
+        s3Service.uploadFile(Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
             location: id,
             etag: 'etag',
             fileName: 'fileName'

@@ -101,7 +101,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
             const finalFileName = `${finalPdfName}.pdf`;
             const s3Location = await this.s3Service.uploadFile(this.bucketName, fileLocation,
-                finalFileName, this.pdfMetaData);
+                finalFileName);
             logger.debug(`S3 etag ${s3Location}`);
 
             return {
