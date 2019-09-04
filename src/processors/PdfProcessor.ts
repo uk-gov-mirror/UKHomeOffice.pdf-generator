@@ -57,6 +57,7 @@ export class PdfProcessor {
                 logger.warn('Failed job notified via web-hook');
                 try {
                     await job.remove();
+                    logger.info('Removed job from pdf queue');
                 } catch (e) {
                     logger.warn(e.message);
                 }

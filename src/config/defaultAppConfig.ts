@@ -10,7 +10,6 @@ const {
     PDF_GENERATOR_KEYCLOAK_CLIENT_ID,
     KEYCLOAK_REALM,
     PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET,
-    PDF_GENERATOR_KEYCLOAK_SESSION_SECRET,
     REDIS_PORT,
     REDIS_URI,
     REDIS_TOKEN,
@@ -24,19 +23,11 @@ const {
     PDF_GENERATOR_AWS_S3_PORT,
     PDF_GENERATOR_AWS_S3_REGION,
     PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER,
-    PDF_GENERATOR_ARENA_ACCESS_ROLES,
-    PDF_GENERATOR_ARENA_PORT,
 } = process.env;
 
 const defaultAppConfig: AppConfig = {
     port: PDF_GENERATOR_PORT ? +PDF_GENERATOR_PORT : DEFAULT_PORT,
-    arena: {
-       port: +PDF_GENERATOR_ARENA_PORT,
-       accessRoles: PDF_GENERATOR_ARENA_ACCESS_ROLES ?
-           PDF_GENERATOR_ARENA_ACCESS_ROLES.split(',') : [],
-    },
     keycloak: {
-        sessionSecret: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET,
         uri: KEYCLOAK_URI || 'http://localhost:8080/auth',
         realm: KEYCLOAK_REALM || 'elf',
         client: {

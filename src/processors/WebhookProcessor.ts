@@ -48,6 +48,7 @@ export class WebhookProcessor {
                     {error: error.stack});
                 try {
                     await job.remove();
+                    logger.info('Removed job from webhook queue');
                 } catch (e) {
                     logger.warn(e.message);
                 }
