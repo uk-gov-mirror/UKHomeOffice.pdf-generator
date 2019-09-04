@@ -108,11 +108,9 @@ const server = new InversifyExpressServer(container,
     {rootPath: basePath},
     expressApp);
 
-
 arenaExpressApp.listen(appConfig.arena.port, () => {
     logger.info(`Arena running on ${appConfig.arena.port}`);
 });
-
 
 const clearUp = async () => {
     eventEmitter.emit(ApplicationConstants.SHUTDOWN_EVENT);
