@@ -55,6 +55,11 @@ export class PdfProcessor {
                 });
                 await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
                 logger.warn('Failed job notified via web-hook');
+                try {
+                    await job.remove();
+                } catch(e) {
+                    logger.warn(e.message);
+                }
             }
 
         });

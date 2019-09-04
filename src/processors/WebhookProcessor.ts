@@ -46,6 +46,11 @@ export class WebhookProcessor {
             } else {
                 logger.error(`Web-hook job failed for ${job.data.url} after max retries.`,
                     {error: error.stack});
+                try {
+                    await job.remove();
+                } catch(e) {
+                    logger.warn(e.message);
+                }
             }
         });
         this.webhookQueue.process(async (job: Job) => {
