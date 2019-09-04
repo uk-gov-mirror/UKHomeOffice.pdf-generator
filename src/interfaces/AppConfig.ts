@@ -10,6 +10,7 @@ interface AppConfig {
         },
     };
     arena: {
+        port: number,
         accessRoles: string[],
     };
     aws: {

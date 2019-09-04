@@ -32,6 +32,8 @@ if (result.error) {
 const basePath = ``;
 const expressApp: Application = express();
 
+const arenaExpressApp: Application = express();
+
 let redisConfig;
 if (appConfig.redis.ssl) {
     redisConfig = {
@@ -80,14 +82,14 @@ const kcConfig = {
 };
 const memoryStore: session.MemoryStore = new session.MemoryStore();
 const keycloak: Keycloak = new Keycloak({store: memoryStore}, kcConfig);
-expressApp.use(session({
+arenaExpressApp.use(session({
     secret: appConfig.keycloak.sessionSecret,
     resave: false,
     saveUninitialized: true,
     store: memoryStore,
 }));
-expressApp.use(keycloak.middleware());
-expressApp.use('/admin', keycloak.protect((token: Token, req: express.Request) => {
+arenaExpressApp.use(keycloak.middleware());
+arenaExpressApp.use('/admin', keycloak.protect((token: Token, req: express.Request) => {
     if (appConfig.arena.accessRoles.length !== 0) {
         let hasAccess = false;
         appConfig.arena.accessRoles.forEach((role: string) => {
@@ -99,12 +101,18 @@ expressApp.use('/admin', keycloak.protect((token: Token, req: express.Request) =
     }
 }), arenaConfig);
 
-expressApp.use(httpContext.middleware);
+arenaExpressApp.use(httpContext.middleware);
 
 const server = new InversifyExpressServer(container,
     null,
     {rootPath: basePath},
     expressApp);
+
+
+arenaExpressApp.listen(appConfig.arena.port, () => {
+    logger.info(`Arena running on ${appConfig.arena.port}`);
+});
+
 
 const clearUp = async () => {
     eventEmitter.emit(ApplicationConstants.SHUTDOWN_EVENT);

@@ -48,7 +48,7 @@ export class WebhookProcessor {
                     {error: error.stack});
                 try {
                     await job.remove();
-                } catch(e) {
+                } catch (e) {
                     logger.warn(e.message);
                 }
             }

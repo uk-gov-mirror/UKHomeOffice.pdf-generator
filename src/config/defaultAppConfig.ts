@@ -25,11 +25,13 @@ const {
     PDF_GENERATOR_AWS_S3_REGION,
     PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER,
     PDF_GENERATOR_ARENA_ACCESS_ROLES,
+    PDF_GENERATOR_ARENA_PORT
 } = process.env;
 
 const defaultAppConfig: AppConfig = {
     port: PDF_GENERATOR_PORT ? +PDF_GENERATOR_PORT : DEFAULT_PORT,
     arena: {
+       port: +PDF_GENERATOR_ARENA_PORT,
        accessRoles: PDF_GENERATOR_ARENA_ACCESS_ROLES ?
            PDF_GENERATOR_ARENA_ACCESS_ROLES.split(',') : [],
     },

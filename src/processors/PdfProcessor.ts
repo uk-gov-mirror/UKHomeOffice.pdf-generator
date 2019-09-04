@@ -57,7 +57,7 @@ export class PdfProcessor {
                 logger.warn('Failed job notified via web-hook');
                 try {
                     await job.remove();
-                } catch(e) {
+                } catch (e) {
                     logger.warn(e.message);
                 }
             }
