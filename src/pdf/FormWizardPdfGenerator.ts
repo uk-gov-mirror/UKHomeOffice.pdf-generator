@@ -44,6 +44,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 });
             });
         };
+
         const panels: any[] = util.searchComponents(schema.components, {
             type: 'panel',
         });
@@ -186,7 +187,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 });
             }
             if (fileLocation) {
-                // await this.deleteFile(fileLocation);
+                await this.deleteFile(fileLocation);
             }
         }
     }

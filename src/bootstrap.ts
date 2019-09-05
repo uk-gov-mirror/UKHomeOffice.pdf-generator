@@ -11,9 +11,15 @@ import {ConfigValidator} from './config/ConfigValidator';
 import {EventEmitter} from 'events';
 import cluster from 'cluster';
 import os from 'os';
+import v8 from 'v8';
+
+const totalHeapSize = v8.getHeapStatistics().total_available_size;
+const totalHeapSizeGb = (totalHeapSize / 1024 / 1024 / 1024).toFixed(2);
+logger.info(`totalHeapSizeGb: ${totalHeapSizeGb}`);
 
 if (cluster.isMaster) {
     const cpuCount = os.cpus().length;
+    logger.info(`CPU count: ${cpuCount}`);
     for (let i = 0; i < cpuCount; i++) {
         cluster.fork();
     }
