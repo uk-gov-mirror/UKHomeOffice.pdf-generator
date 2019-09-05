@@ -18,7 +18,7 @@ const totalHeapSizeGb = (totalHeapSize / 1024 / 1024 / 1024).toFixed(2);
 logger.info(`totalHeapSizeGb: ${totalHeapSizeGb}`);
 
 if (cluster.isMaster) {
-    const cpuCount = os.cpus().length;
+    const cpuCount = 3;
     logger.info(`CPU count: ${cpuCount}`);
     for (let i = 0; i < cpuCount; i++) {
         cluster.fork();
