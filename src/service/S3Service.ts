@@ -5,7 +5,7 @@ import AppConfig from '../interfaces/AppConfig';
 import logger from '../util/logger';
 import * as fs from 'fs';
 import S3 from 'aws-sdk/clients/s3';
-import cluster from "cluster";
+import cluster from 'cluster';
 
 @provide(TYPE.S3Service)
 export class S3Service {
@@ -82,8 +82,8 @@ export class S3Service {
                     logger.info(`Successfully ${params.Key} uploaded to S3`, {
                         etag,
                         cluster: {
-                            workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                        }
+                            workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                        },
                     });
                     resolve({
                         location: `${this.s3Url}/${params.Key}`,

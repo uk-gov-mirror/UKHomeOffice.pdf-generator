@@ -11,8 +11,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
-import cluster from "cluster";
-
+import cluster from 'cluster';
 
 @provide(TYPE.FormWizardPdfGenerator)
 export class FormWizardPdfGenerator extends PdfGenerator {
@@ -23,11 +22,6 @@ export class FormWizardPdfGenerator extends PdfGenerator {
         super(appConfig, formTemplateResolver, s3Service);
 
     }
-
-    private async filterBlankPdfFiles(pdfFiles: string[]): Promise<string[]> {
-        return pdfFiles;
-    }
-
 
     public async generatePdf(schema: any, formSubmission: any): Promise<{
         fileLocation: string,
@@ -64,11 +58,11 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                     '--ignore-certificate-errors',
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage']
-            }).then(async browser => {
+                    '--disable-dev-shm-usage'],
+            }).then(async (browser) => {
                 const promises = [];
                 _.forEach(panels, async (panel, index) => {
-                    promises.push(browser.newPage().then(async page => {
+                    promises.push(browser.newPage().then(async (page) => {
                         panel.conditional = {eq: 'yes', show: 'true', when: null};
                         const newSchema: any = {
                             name: schema.name,
@@ -95,8 +89,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                                 logger.error(`Page error detected at ${tempPath}`, {
                                     error: error.message,
                                     cluster: {
-                                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                                    }
+                                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                                    },
                                 });
                             });
 
@@ -107,8 +101,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
                             logger.info(`${tempFileName}.pdf created`, {
                                 cluster: {
-                                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                                }
+                                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                                },
                             });
 
                             return tempPath;
@@ -122,8 +116,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                                 errorPagePath, `${tempFileName}-error.png`);
                             logger.info('Uploaded error page', {
                                 cluster: {
-                                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                                }
+                                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                                },
                             });
 
                             await this.deleteFile(errorPagePath);
@@ -142,8 +136,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
             logger.info(`Performing final merge for ${finalFileName}`, {
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
 
             const updatedPdfFiles: string[] = await this.filterBlankPdfFiles(pdfFiles);
@@ -151,8 +145,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             fileLocation = await mergeMultiplePDF(updatedPdfFiles, `${finalFileName}`);
             logger.info(`Merge completed for ${finalFileName}`, {
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
 
             const s3Location = await this.s3Service.uploadFile(this.bucketName, fileLocation,
@@ -160,8 +154,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
             logger.info(`S3 etag ${s3Location}`, {
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
 
             return {
@@ -174,8 +168,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             logger.error('An exception occurred ', {
                 error: e.message,
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
             throw new InternalServerError(e);
 
@@ -183,17 +177,21 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             if (pdfFiles.length !== 0) {
                 logger.info('Deleting temp files created', {
                     cluster: {
-                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                    }
+                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                    },
                 });
                 _.forEach(pdfFiles, async (file) => {
                     await this.deleteFile(file);
-                    await this.deleteFile(file.replace('.pdf', '.html'))
+                    await this.deleteFile(file.replace('.pdf', '.html'));
                 });
             }
             if (fileLocation) {
                 // await this.deleteFile(fileLocation);
             }
         }
+    }
+
+    private async filterBlankPdfFiles(pdfFiles: string[]): Promise<string[]> {
+        return pdfFiles;
     }
 }

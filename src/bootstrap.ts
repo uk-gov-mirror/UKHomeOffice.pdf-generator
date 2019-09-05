@@ -74,4 +74,3 @@ if (cluster.isMaster) {
 
     exports = module.exports = expressApplication;
 }
-

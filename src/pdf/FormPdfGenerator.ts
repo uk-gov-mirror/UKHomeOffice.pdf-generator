@@ -8,7 +8,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
-import cluster from "cluster";
+import cluster from 'cluster';
 
 @provide(TYPE.FormPdfGenerator)
 export class FormPdfGenerator extends PdfGenerator {
@@ -28,8 +28,8 @@ export class FormPdfGenerator extends PdfGenerator {
     }> {
         logger.info('Generating pdf for form', {
             cluster: {
-                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-            }
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+            },
         });
         const formName = schema.name;
         const finalPdfName = this.finalPdfName(formSubmission, schema);
@@ -49,8 +49,8 @@ export class FormPdfGenerator extends PdfGenerator {
 
         logger.debug('Opened browser for creating PDF', {
             cluster: {
-                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-            }
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+            },
         });
         const page = await browser.newPage();
 
@@ -62,8 +62,8 @@ export class FormPdfGenerator extends PdfGenerator {
 
             logger.info(`PDF generated for ${formName}...now uploading to file store.`, {
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
 
             const finalFileName = `${finalPdfName}.pdf`;
@@ -72,8 +72,8 @@ export class FormPdfGenerator extends PdfGenerator {
 
             logger.info(`File location ${JSON.stringify(response)}`, {
                 cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-                }
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                },
             });
 
             return {

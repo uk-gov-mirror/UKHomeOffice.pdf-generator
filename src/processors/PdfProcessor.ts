@@ -27,8 +27,8 @@ export class PdfProcessor {
     public init(): void {
         logger.info(`PDF job processing ready`, {
             cluster: {
-                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
-            }
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+            },
         });
         this.pdfQueue.on('completed', async (job: Job, result: any) => {
             const data = result.data.payload.data;
@@ -63,7 +63,7 @@ export class PdfProcessor {
                     cluster: {
                         workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                         jobId: job.id,
-                    }
+                    },
                 });
                 try {
                     await job.remove();
@@ -88,7 +88,7 @@ export class PdfProcessor {
             cluster: {
                 workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                 jobId: job.id,
-            }
+            },
         });
         try {
             let result: { fileLocation: string, message: string, etag: string, fileName: string } = null;
@@ -113,7 +113,7 @@ export class PdfProcessor {
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                     jobId: job.id,
-                }
+                },
             });
             return Promise.reject(error);
         }
