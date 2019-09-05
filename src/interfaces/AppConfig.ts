@@ -19,7 +19,7 @@ interface AppConfig {
             region: string,
             kmsKey: string,
             buckets: {
-                pdf: string,
+                pdf: string
             },
         },
     };

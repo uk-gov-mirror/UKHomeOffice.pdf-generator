@@ -5,6 +5,7 @@ import AppConfig from '../interfaces/AppConfig';
 import logger from '../util/logger';
 import * as fs from 'fs';
 import S3 from 'aws-sdk/clients/s3';
+import cluster from "cluster";
 
 @provide(TYPE.S3Service)
 export class S3Service {
@@ -28,6 +29,17 @@ export class S3Service {
 
     }
 
+    public async uploadError(bucketName: string, filePath: string, key: string) {
+        const params = {
+            Bucket: bucketName,
+            Key: key,
+            Body: fs.readFileSync(filePath),
+            ContentType: 'image/png',
+            ServerSideEncryption: 'aws:kms',
+            SSEKMSKeyId: this.s3Config.kmsKey,
+        };
+        return this.uploadToS3(params);
+    }
     public async upload(bucketName: string,
                         file: Buffer,
                         objectName: string): Promise<{ location, etag }> {
@@ -69,6 +81,9 @@ export class S3Service {
                     const etag = data.ETag.replace(/(^"|"$)/g, '');
                     logger.info(`Successfully ${params.Key} uploaded to S3`, {
                         etag,
+                        cluster: {
+                            workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+                        }
                     });
                     resolve({
                         location: `${this.s3Url}/${params.Key}`,

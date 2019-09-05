@@ -8,17 +8,12 @@ export class ConfigValidator {
     constructor() {
         this.schema = Joi.object().keys({
             keycloak: Joi.object({
-                sessionSecret: Joi.string().required(),
                 uri: Joi.string().required(),
                 realm: Joi.string().required(),
                 client: Joi.object().keys({
                     secret: Joi.string().required(),
                     id: Joi.string(),
                 }),
-            }),
-            arena: Joi.object().optional().keys({
-                port: Joi.number(),
-                accessRoles: Joi.array().items(Joi.string()).optional(),
             }),
             port: Joi.number().optional(),
             redis: Joi.object().keys({

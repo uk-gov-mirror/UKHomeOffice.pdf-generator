@@ -8,6 +8,7 @@ import AppConfig from '../interfaces/AppConfig';
 import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
+import cluster from "cluster";
 
 @provide(TYPE.FormPdfGenerator)
 export class FormPdfGenerator extends PdfGenerator {
@@ -25,7 +26,11 @@ export class FormPdfGenerator extends PdfGenerator {
         etag: string,
         fileName: string,
     }> {
-        logger.info('Generating pdf for form');
+        logger.info('Generating pdf for form', {
+            cluster: {
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+            }
+        });
         const formName = schema.name;
         const finalPdfName = this.finalPdfName(formSubmission, schema);
 
@@ -42,7 +47,11 @@ export class FormPdfGenerator extends PdfGenerator {
             args: ['--disable-web-security', '--no-sandbox'],
         });
 
-        logger.debug('Opened browser for creating PDF');
+        logger.debug('Opened browser for creating PDF', {
+            cluster: {
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+            }
+        });
         const page = await browser.newPage();
 
         try {
@@ -51,13 +60,21 @@ export class FormPdfGenerator extends PdfGenerator {
 
             const pdf = await page.pdf({format: 'A4'});
 
-            logger.info(`PDF generated for ${formName}...now uploading to file store.`);
+            logger.info(`PDF generated for ${formName}...now uploading to file store.`, {
+                cluster: {
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+                }
+            });
 
             const finalFileName = `${finalPdfName}.pdf`;
 
             const response = await this.s3Service.upload(this.bucketName, pdf, finalFileName);
 
-            logger.info(`File location ${JSON.stringify(response)}`);
+            logger.info(`File location ${JSON.stringify(response)}`, {
+                cluster: {
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+                }
+            });
 
             return {
                 fileName: finalFileName,

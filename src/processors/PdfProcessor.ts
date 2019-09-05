@@ -25,14 +25,19 @@ export class PdfProcessor {
 
     @postConstruct()
     public init(): void {
-        logger.info(`PDF job processing ready`);
+        logger.info(`PDF job processing ready`, {
+            cluster: {
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster'
+            }
+        });
         this.pdfQueue.on('completed', async (job: Job, result: any) => {
-            logger.info(`${result.message}`, {
+            const data = result.data.payload.data;
+            logger.info(`${data.message}`, {
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                     jobId: job.id,
                 },
-                fileLocation: result.fileLocation,
+                fileLocation: data.fileLocation,
             });
             await job.remove();
         });
@@ -54,7 +59,12 @@ export class PdfProcessor {
                     },
                 });
                 await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
-                logger.warn('Failed job notified via web-hook');
+                logger.warn('Failed job notified via web-hook', {
+                    cluster: {
+                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                        jobId: job.id,
+                    }
+                });
                 try {
                     await job.remove();
                     logger.info('Removed job from pdf queue');
@@ -74,9 +84,14 @@ export class PdfProcessor {
 
         const formSubmission = job.data.submission;
         const formName = schema.name;
-        logger.info(`Initiating pdf generation of ${formName}`);
+        logger.info(`Initiating pdf generation of ${formName}`, {
+            cluster: {
+                workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                jobId: job.id,
+            }
+        });
         try {
-            let result: { fileLocation: string, message: string, etag: string, fileName: string} = null;
+            let result: { fileLocation: string, message: string, etag: string, fileName: string } = null;
             if (schema.display === 'wizard') {
                 result = await this.formWizardPdfGenerator.generatePdf(schema, formSubmission);
             } else {
@@ -85,6 +100,7 @@ export class PdfProcessor {
             const success = new WebhookJob(job.data.webhookUrl, {
                 event: ApplicationConstants.PDF_GENERATED_SUCCESS,
                 data: {
+                    message: result.message,
                     location: result.fileLocation,
                     etag: result.etag,
                     fileName: result.fileName,
@@ -92,7 +108,13 @@ export class PdfProcessor {
             });
             return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
         } catch (error) {
-            logger.error('Failed to create pdf', error);
+            logger.error('Failed to create pdf', {
+                error: error.message,
+                cluster: {
+                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                    jobId: job.id,
+                }
+            });
             return Promise.reject(error);
         }
     }
