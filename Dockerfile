@@ -8,7 +8,7 @@ RUN npm prune --production
 
 
 FROM digitalpatterns/node:latest
-RUN yum install -y libX11-devel libX11-common libXcomposite libXcursor libXdamage libXext libXi libXtst cups-libs libXScrnSaver libXrandr alsa-lib atk at-spi2-atk cairo pango gtk3 java-1.8.0-openjdk
+RUN yum install -y libX11-devel libX11-common libXcomposite libXcursor libXdamage libXext libXi libXtst cups-libs libXScrnSaver libXrandr alsa-lib atk at-spi2-atk cairo pango gtk3 java-1.8.0-openjdk redis stunnel
 WORKDIR /app
 RUN mkdir -p /app
 COPY --from=build /src/node_modules node_modules
