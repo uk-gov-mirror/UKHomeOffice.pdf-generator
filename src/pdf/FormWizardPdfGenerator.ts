@@ -87,12 +87,15 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                             page.setDefaultTimeout(0);
 
                             page.on('error', (error) => {
-                                logger.error(`Page error detected at ${tempPath}`, {
-                                    error: error.message,
-                                    cluster: {
-                                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
-                                    },
-                                });
+                                logger.error(
+                                    `Page error detected at ${tempPath}
+                                                panel key: ${panel.key} title: ${panel.title} `,
+                                    {
+                                        error: error.message,
+                                        cluster: {
+                                            workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                                        },
+                                    });
                             });
 
                             await page.goto(`file://${htmlFileName}`,
@@ -108,8 +111,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
                             return tempPath;
                         } catch (e) {
-
-                            logger.error(e.message);
+                            logger.error(`Failed to process panel key: ${panel.key} and title ${panel.title}`,
+                                e);
                             const errorPagePath = `/tmp/${tempFileName}-error.png`;
                             await page.screenshot({path: errorPagePath});
 
@@ -153,7 +156,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             const s3Location = await this.s3Service.uploadFile(this.bucketName, fileLocation,
                 finalFileName);
 
-            logger.info(`S3 etag ${s3Location}`, {
+            logger.info(`S3 etag ${s3Location.etag}`, {
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                 },
@@ -166,7 +169,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 message: `Form ${formName} successfully created and uploaded to file store`,
             };
         } catch (e) {
-            logger.error('An exception occurred ', {
+            logger.error('An exception occurred', {
                 error: e.message,
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
@@ -182,12 +185,20 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                     },
                 });
                 _.forEach(pdfFiles, async (file) => {
-                    await this.deleteFile(file);
-                    await this.deleteFile(file.replace('.pdf', '.html'));
+                    try {
+                        await this.deleteFile(file);
+                        await this.deleteFile(file.replace('.pdf', '.html'));
+                    } catch (e) {
+                        logger.warn(`Failure to delete temp files ${e.message}`);
+                    }
                 });
             }
             if (fileLocation) {
-                await this.deleteFile(fileLocation);
+                try {
+                    await this.deleteFile(fileLocation);
+                } catch (e) {
+                    logger.warn(`Failure to delete ${fileLocation} due to ${e.message}`);
+                }
             }
         }
     }

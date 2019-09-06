@@ -11,6 +11,7 @@ import {FormPdfGenerator} from '../pdf/FormPdfGenerator';
 import {KeycloakService} from '../service/KeycloakService';
 import {WebhookJob} from '../model/WebhookJob';
 import {ApplicationConstants} from '../constant/ApplicationConstants';
+import axiosInstance from '../util/axios';
 
 @provide(TYPE.PdfProcessor)
 export class PdfProcessor {
@@ -80,7 +81,34 @@ export class PdfProcessor {
     }
 
     public async handlePdf(job: Job): Promise<any> {
-        const schema = job.data.formSchema;
+        let schema;
+        const formUrl = job.data.formUrl;
+        if (formUrl) {
+            const accessToken = await this.kecycloakService.getAccessToken();
+            try {
+                const response = await axiosInstance.get(formUrl, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+                schema = response.data;
+            } catch (e) {
+                logger.error(`Failed to load form for ${formUrl}`, {
+                    error: e.message,
+                    cluster: {
+                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                        jobId: job.id,
+                    },
+                });
+                return Promise.reject(new Error(`Failed to load form from ${formUrl}`));
+            }
+        } else {
+            schema = job.data.formSchema;
+        }
+
+        if (!schema) {
+            return Promise.reject(new Error('No schema defined for processing'));
+        }
 
         const formSubmission = job.data.submission;
         const formName = schema.name;

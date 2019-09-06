@@ -1,12 +1,17 @@
 interface AppConfig {
     port: number;
     keycloak: {
+        sessionSecret: string,
         uri: string,
         realm: string,
         client: {
             secret: string,
             id: string,
         },
+    };
+    arena: {
+        port: number,
+        accessRoles: string[],
     };
     aws: {
         s3: {
