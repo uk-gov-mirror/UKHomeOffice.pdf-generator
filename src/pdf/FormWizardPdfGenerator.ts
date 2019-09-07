@@ -16,9 +16,9 @@ import * as fs from 'fs';
 
 @provide(TYPE.FormWizardPdfGenerator)
 export class FormWizardPdfGenerator extends PdfGenerator {
+    private static readonly MIN_PAGE_COUNT: number = 2;
 
     private readonly panelProcessor: EmptySubmissionFormProcessor = new EmptySubmissionFormProcessor();
-    private static readonly MIN_PAGE_COUNT: number = 2;
 
     constructor(@inject(TYPE.AppConfig) appConfig: AppConfig,
                 @inject(TYPE.FormTemplateResolver) formTemplateResolver: FormTemplateResolver,
