@@ -27,7 +27,7 @@ describe('FormWizardPdfGenerator', () => {
         const submission = {
             "data": {
                 "textField": "AA",
-                "textField1": "AA"
+                "textField1": "AA1"
             }
         };
 

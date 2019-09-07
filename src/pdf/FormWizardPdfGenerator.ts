@@ -1,7 +1,6 @@
 import {provide} from 'inversify-binding-decorators';
 import TYPE from '../constant/TYPE';
 import {PdfGenerator} from './PdfGenerator';
-import util from 'formiojs/utils';
 import puppeteer from 'puppeteer';
 import logger from '../util/logger';
 import merge from 'easy-pdf-merge';
@@ -12,9 +11,14 @@ import {FormTemplateResolver} from './FormTemplateResolver';
 import InternalServerError from '../error/InternalServerError';
 import {S3Service} from '../service/S3Service';
 import cluster from 'cluster';
+import {EmptySubmissionFormProcessor} from './EmptySubmissionFormProcessor';
+import * as fs from 'fs';
 
 @provide(TYPE.FormWizardPdfGenerator)
 export class FormWizardPdfGenerator extends PdfGenerator {
+
+    private readonly panelProcessor: EmptySubmissionFormProcessor = new EmptySubmissionFormProcessor();
+    private static readonly MIN_PAGE_COUNT: number = 2;
 
     constructor(@inject(TYPE.AppConfig) appConfig: AppConfig,
                 @inject(TYPE.FormTemplateResolver) formTemplateResolver: FormTemplateResolver,
@@ -45,8 +49,11 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             });
         };
 
-        const panels: any[] = util.searchComponents(schema.components, {
-            type: 'panel',
+        const panels: any[] = this.panelProcessor.processEmptyContent(schema, formSubmission);
+
+        logger.info(`Panels selected for printing...`, {
+            businessKey: formSubmission.data.businessKey,
+            panels: panels.map((p) => p.title),
         });
 
         let fileLocation: string = null;
@@ -75,7 +82,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                         const htmlContent = await this.formTemplateResolver
                             .renderContentAsHtml(newSchema, formSubmission);
 
-                        const tempFileName = `/tmp/${finalPdfName}-${index}`;
+                        const tempFileName = `/tmp/${panel.key}-${finalPdfName}-${index}`;
 
                         const htmlFileName = `${tempFileName}.html`;
 
@@ -92,6 +99,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                                                 panel key: ${panel.key} title: ${panel.title} `,
                                     {
                                         error: error.message,
+                                        businessKey: formSubmission.data.businessKey,
                                         cluster: {
                                             workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                                         },
@@ -104,6 +112,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                             await page.pdf({path: tempPath, format: 'A4'});
 
                             logger.info(`${tempFileName}.pdf created`, {
+                                businessKey: formSubmission.data.businessKey,
                                 cluster: {
                                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                                 },
@@ -114,17 +123,21 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                             logger.error(`Failed to process panel key: ${panel.key} and title ${panel.title}`,
                                 e);
                             const errorPagePath = `/tmp/${tempFileName}-error.png`;
+
                             await page.screenshot({path: errorPagePath});
 
                             await this.s3Service.uploadError(this.appConfig.aws.s3.buckets.pdf,
                                 errorPagePath, `${tempFileName}-error.png`);
+
                             logger.info('Uploaded error page', {
+                                businessKey: formSubmission.data.businessKey,
                                 cluster: {
                                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                                 },
                             });
 
                             await this.deleteFile(errorPagePath);
+
                             return tempPath;
                         }
                     }));
@@ -134,11 +147,12 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 return files;
             });
 
-            logger.info(`PDF files ${pdfFiles.length}`);
+            logger.debug(`PDF files ${pdfFiles.length}`);
 
             const finalFileName = `${finalPdfName}.pdf`;
 
             logger.info(`Performing final merge for ${finalFileName}`, {
+                businessKey: formSubmission.data.businessKey,
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                 },
@@ -146,17 +160,24 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
             const updatedPdfFiles: string[] = await this.filterBlankPdfFiles(pdfFiles);
 
-            fileLocation = await mergeMultiplePDF(updatedPdfFiles, `${finalFileName}`);
-            logger.info(`Merge completed for ${finalFileName}`, {
-                cluster: {
-                    workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
-                },
-            });
+            if (updatedPdfFiles.length >= FormWizardPdfGenerator.MIN_PAGE_COUNT ) {
+                fileLocation = await mergeMultiplePDF(updatedPdfFiles, `${finalFileName}`);
+                logger.info(`Merge completed for ${finalFileName}`, {
+                    businessKey: formSubmission.data.businessKey,
+                    cluster: {
+                        workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
+                    },
+                });
+            } else {
+                logger.info('Single pdf file detected so not performing merge');
+                fileLocation = await this.rename(updatedPdfFiles[0], `/tmp/${finalFileName}`);
+            }
 
             const s3Location = await this.s3Service.uploadFile(this.bucketName, fileLocation,
                 finalFileName);
 
             logger.info(`S3 etag ${s3Location.etag}`, {
+                businessKey: formSubmission.data.businessKey,
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                 },
@@ -170,6 +191,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
             };
         } catch (e) {
             logger.error('An exception occurred', {
+                businessKey: formSubmission.data.businessKey,
                 error: e.message,
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
@@ -179,7 +201,8 @@ export class FormWizardPdfGenerator extends PdfGenerator {
 
         } finally {
             if (pdfFiles.length !== 0) {
-                logger.info('Deleting temp files created', {
+                logger.debug('Deleting temp files created', {
+                    businessKey: formSubmission.data.businessKey,
                     cluster: {
                         workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                     },
@@ -189,7 +212,9 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                         await this.deleteFile(file);
                         await this.deleteFile(file.replace('.pdf', '.html'));
                     } catch (e) {
-                        logger.warn(`Failure to delete temp files ${e.message}`);
+                        logger.debug(`Failure to delete temp files ${e.message}`, {
+                            businessKey: formSubmission.data.businessKey,
+                        });
                     }
                 });
             }
@@ -197,10 +222,24 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                 try {
                     await this.deleteFile(fileLocation);
                 } catch (e) {
-                    logger.warn(`Failure to delete ${fileLocation} due to ${e.message}`);
+                    logger.debug(`Failure to delete ${fileLocation} due to ${e.message}`, {
+                        businessKey: formSubmission.data.businessKey,
+                    });
                 }
             }
         }
+    }
+
+    private async rename(oldFile: string, newFile: string): Promise<string> {
+       return new Promise((resolve, reject) => {
+           fs.rename(oldFile, newFile, (error) => {
+               if (error) {
+                   reject(error);
+               } else {
+                   resolve(newFile);
+               }
+           });
+       });
     }
 
     private async filterBlankPdfFiles(pdfFiles: string[]): Promise<string[]> {

@@ -36,6 +36,7 @@ export abstract class PdfGenerator {
     }
 
     protected async deleteFile(file: string): Promise<string> {
+
         return new Promise((resolve, reject) => {
             fs.unlink(file, (error) => {
                 if (error) {

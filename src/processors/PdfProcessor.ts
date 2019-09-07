@@ -113,6 +113,7 @@ export class PdfProcessor {
         const formSubmission = job.data.submission;
         const formName = schema.name;
         logger.info(`Initiating pdf generation of ${formName}`, {
+            businessKey: formSubmission.data.businessKey,
             cluster: {
                 workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                 jobId: job.id,
@@ -137,6 +138,7 @@ export class PdfProcessor {
             return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
         } catch (error) {
             logger.error('Failed to create pdf', {
+                businessKey: formSubmission.data.businessKey,
                 error: error.message,
                 cluster: {
                     workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
