@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {expect} from "chai";
 import {EmptySubmissionFormProcessor} from "../../../src/pdf/EmptySubmissionFormProcessor";
-import {wizardForm} from "../../form";
+import {sampleForm, wizardForm} from "../../form";
 
 describe('EmptySubmissionFormProcessor', () => {
     it('can process empty content', () => {
@@ -17,4 +17,37 @@ describe('EmptySubmissionFormProcessor', () => {
 
         expect(updatedPanels.length).to.be.eq(1);
     });
+
+    it('can process null data', () => {
+        const panelProcessor = new EmptySubmissionFormProcessor();
+        const submission = {
+            "data": {
+                "textField": "AA",
+                "aviationPassengerCrewContainer": {
+                    "checkbox": false,
+                    "aviationPassengerCrewGrid": [{
+                        "aviationPassengerCrew_crewRole": {},
+                        "aviationPassengerCrew_surname": "aa",
+                        "aviationPassengerCrew_forename": "",
+                        "aviationPassengerCrew_dob": "00/00/0000",
+                        "aviationPassengerCrew_sex": {},
+                        "aviationPassengerCrew_passportIDNum": "",
+                        "aviationPassengerCrew_nationality": {},
+                        "aviationPassengerCrew_addressLine1": "",
+                        "aviationPassengerCrew_addressLine2": "",
+                        "aviationPassengerCrew_addressLine3": "",
+                        "aviationPassengerCrew_townCity": "",
+                        "aviationPassengerCrew_postcode": "",
+                        "aviationPassengerCrew_country": {},
+                        "aviationPassengerCrew_phoneNumber": "",
+                        "aviationPassengerCrew_validVisaRad": ""
+                    }]
+                }
+            }
+
+        };
+        const updatedPanels = panelProcessor.processEmptyContent(sampleForm, submission);
+
+        expect(updatedPanels.length).to.be.eq(2);
+    })
 });
