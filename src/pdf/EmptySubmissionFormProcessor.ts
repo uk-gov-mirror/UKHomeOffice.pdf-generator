@@ -1,7 +1,7 @@
 import util from 'formiojs/utils';
 import JSONPath from 'jsonpath';
 import _ from 'lodash';
-import logger from "../util/logger";
+import logger from '../util/logger';
 
 export class EmptySubmissionFormProcessor {
 
