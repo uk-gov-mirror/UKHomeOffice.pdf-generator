@@ -19,6 +19,9 @@ export class EmptySubmissionFormProcessor {
     private handleEmptyData(panels: any[], submission: any, cleanedPanels): void {
         panels.forEach((panel) => {
             util.eachComponent(panel.components, (component, path) => {
+                if (component.type === 'panel') {
+                    component.customClass += ' page';
+                }
                 if (!path) {
                     return;
                 }
