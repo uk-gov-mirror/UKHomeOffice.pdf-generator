@@ -4,19 +4,22 @@ import AppConfig from "../../../src/interfaces/AppConfig";
 import defaultAppConfig from "../../../src/config/defaultAppConfig";
 import {FormTemplateResolver} from "../../../src/pdf/FormTemplateResolver";
 import {S3Service} from "../../../src/service/S3Service";
-import {Arg, Substitute} from "@fluffy-spoon/substitute";
+import {Arg, Substitute, SubstituteOf} from "@fluffy-spoon/substitute";
 import {FormPdfGenerator} from "../../../src/pdf/FormPdfGenerator";
 import {basicForm} from "../../form";
+import {KeycloakService} from "../../../src/service/KeycloakService";
 
 describe('FormPdfGenerator', () => {
 
     const appConfig: AppConfig = defaultAppConfig;
     let formTemplateResolver: FormTemplateResolver;
-    let s3Service: S3Service;
+    let s3Service: SubstituteOf<S3Service>;
     let formPdfGenerator: FormPdfGenerator;
+    let keycloakService: SubstituteOf<KeycloakService>;
 
     beforeEach(() => {
-        formTemplateResolver = new FormTemplateResolver();
+        keycloakService = Substitute.for<KeycloakService>();
+        formTemplateResolver = new FormTemplateResolver(keycloakService);
         s3Service = Substitute.for<S3Service>();
         formPdfGenerator = new FormPdfGenerator(appConfig, formTemplateResolver, s3Service);
     });
@@ -29,8 +32,8 @@ describe('FormPdfGenerator', () => {
             }
         };
 
-        // @ts-ignore
-        s3Service.upload(Arg.any(), Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
+        keycloakService.getAccessToken().returns(Promise.resolve('token'));
+        s3Service.upload(Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
             location: 'test',
             etag: 'etag',
             fileName: 'fileName'

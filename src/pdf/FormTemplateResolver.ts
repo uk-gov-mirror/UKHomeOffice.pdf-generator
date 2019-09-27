@@ -1,20 +1,27 @@
 import {provide} from 'inversify-binding-decorators';
 import TYPE from '../constant/TYPE';
-import formTemplate from './formTemplate';
 import utils from 'formiojs/utils';
 import logger from '../util/logger';
 import ejs from 'ejs';
+import {inject} from 'inversify';
+import {KeycloakService} from '../service/KeycloakService';
+import formTemplate from './formTemplate';
 
 @provide(TYPE.FormTemplateResolver)
 export class FormTemplateResolver {
 
+    constructor(@inject(TYPE.KeycloakService) private readonly keycloakService: KeycloakService) {
+    }
+
     public async renderContentAsHtml(formSchema: object, submission: object): Promise<string> {
         const sanitizedFormSchema = this.sanitize(formSchema);
+        const token = await this.keycloakService.getAccessToken();
 
         const template = ejs.compile(formTemplate, {});
         const parsedContent = template({
             formSchema: sanitizedFormSchema,
             submission,
+            token,
         });
 
         return Promise.resolve(parsedContent);

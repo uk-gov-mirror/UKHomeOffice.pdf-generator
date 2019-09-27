@@ -35,12 +35,12 @@ export class KeycloakService {
                 data,
             });
             if (tokenResponse.status !== HttpStatus.OK) {
-                return Promise.reject('Failed to get access token');
+                throw new Error('Failed to get access token');
             }
-            return Promise.resolve(tokenResponse.data.access_token);
+            return tokenResponse.data.access_token;
         } catch (e) {
             logger.error(e.message);
-            return Promise.reject(e);
+            return await Promise.reject(e);
         }
     }
 }

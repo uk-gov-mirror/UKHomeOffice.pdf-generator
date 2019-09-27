@@ -7,6 +7,7 @@ import {S3Service} from "../../../src/service/S3Service";
 import {Arg, Substitute, SubstituteOf} from "@fluffy-spoon/substitute";
 import {wizardForm} from "../../form";
 import {FormWizardPdfGenerator} from "../../../src/pdf/FormWizardPdfGenerator";
+import {KeycloakService} from "../../../src/service/KeycloakService";
 
 
 describe('FormWizardPdfGenerator', () => {
@@ -15,9 +16,11 @@ describe('FormWizardPdfGenerator', () => {
     let formTemplateResolver: FormTemplateResolver;
     let s3Service: SubstituteOf<S3Service>;
     let formWizardPdfGenerator: FormWizardPdfGenerator;
+    let keycloakService: SubstituteOf<KeycloakService>;
 
     beforeEach(() => {
-        formTemplateResolver = new FormTemplateResolver();
+        keycloakService = Substitute.for<KeycloakService>();
+        formTemplateResolver = new FormTemplateResolver(keycloakService);
         s3Service = Substitute.for<S3Service>();
         formWizardPdfGenerator = new FormWizardPdfGenerator(appConfig, formTemplateResolver, s3Service);
     });
@@ -32,6 +35,9 @@ describe('FormWizardPdfGenerator', () => {
         };
 
         const id = 'id';
+
+        keycloakService.getAccessToken().returns(Promise.resolve('token'));
+
         s3Service.uploadFile(Arg.any(), Arg.any(), Arg.any()).returns(Promise.resolve({
             location: id,
             etag: 'etag',
