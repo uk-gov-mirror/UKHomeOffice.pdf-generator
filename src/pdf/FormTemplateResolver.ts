@@ -42,6 +42,7 @@ export class FormTemplateResolver {
             }
             if (component.type === 'panel') {
                 component.collapsed = false;
+                component.hidden = false;
             }
         }, true);
         return formSchema;
