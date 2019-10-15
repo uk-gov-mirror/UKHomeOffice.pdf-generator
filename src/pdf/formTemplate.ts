@@ -11,9 +11,9 @@ const template = `<!doctype html>
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
  <link rel="stylesheet" href="https://unpkg.com/formiojs@4.0.0-rc.27/dist/formio.full.min.css"
         integrity="sha384-qCmHtp5QGqc3DEUNAdcjETwaX3+JYREeRcBOEKW98JTIDWe3VZD9xBlaYc1/gmWZ" crossorigin="anonymous">
-   <script src="https://unpkg.com/formiojs@4.2.8/dist/formio.full.js"
-    integrity="sha384-oO8VpIg5Lz/nw2AjEeeu/KfV5PyGn3lhKfjBLMz/E358Sq7FI9Hmmec9tyyUowEs"
-   crossorigin="anonymous"></script>
+   <script src="https://unpkg.com/formiojs@4.3.4/dist/formio.full.js"
+    integrity="sha384-R3JBdRxZL/+P8lKCGqu1n2cuVon6NTOk7z5xal9wVw0UMu3Kc/YK5gtrxsA9tUWS" crossorigin="anonymous">
+    </script>
 
 </script>
     <script type='text/javascript'>
@@ -65,7 +65,7 @@ const template = `<!doctype html>
         }]
 
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
-            readOnly: true
+            readOnly: true,
        }).then(function(form) {
            form.submission =  <%- JSON.stringify(submission) %>
         });
