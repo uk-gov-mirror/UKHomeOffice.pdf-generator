@@ -9,12 +9,12 @@ const template = `<!doctype html>
 </style>
    <link rel="stylesheet" href="<%- nodeModules %>/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="<%- nodeModules %>/formiojs/dist/formio.full.min.css">
-   <script src="<%- nodeModules %>/formiojs/dist/formio.full.js"></script>
-  
-       
+    <script src="<%- nodeModules %>/formiojs/dist/formio.full.js"></script>
+
+
      <script type='text/javascript'>
       window.onload = function() {
-   
+
        Formio.plugins = [{
         priority: 0,
         preRequest: async function (requestArgs) {
@@ -60,7 +60,7 @@ const template = `<!doctype html>
 
             }
         }]
-   
+
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
             readOnly: true,
        }).then(function(form) {

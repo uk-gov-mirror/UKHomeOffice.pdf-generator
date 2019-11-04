@@ -24,7 +24,7 @@ export class FormTemplateResolver {
             submission,
             token,
             nodeModules,
-            currentDir
+            currentDir,
         });
         return Promise.resolve(parsedContent);
     }
