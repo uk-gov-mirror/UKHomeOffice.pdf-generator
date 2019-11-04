@@ -16,14 +16,16 @@ export class FormTemplateResolver {
     public async renderContentAsHtml(formSchema: object, submission: object): Promise<string> {
         const sanitizedFormSchema = this.sanitize(formSchema);
         const token = await this.keycloakService.getAccessToken();
-
+        const nodeModules = `${process.cwd()}/node_modules`;
+        const currentDir = process.cwd();
         const template = ejs.compile(formTemplate, {});
         const parsedContent = template({
             formSchema: sanitizedFormSchema,
             submission,
             token,
+            nodeModules,
+            currentDir
         });
-
         return Promise.resolve(parsedContent);
     }
 

@@ -1,4 +1,4 @@
-import util from 'formiojs/utils';
+import * as util from 'formiojs/utils/formUtils'
 import JSONPath from 'jsonpath';
 import _ from 'lodash';
 import logger from '../util/logger';

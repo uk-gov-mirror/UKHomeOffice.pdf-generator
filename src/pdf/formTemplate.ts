@@ -7,18 +7,15 @@ const template = `<!doctype html>
         page-break-inside: avoid;
       }
 </style>
- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
- <link rel="stylesheet" href="https://unpkg.com/formiojs@4.0.0-rc.27/dist/formio.full.min.css"
-        integrity="sha384-qCmHtp5QGqc3DEUNAdcjETwaX3+JYREeRcBOEKW98JTIDWe3VZD9xBlaYc1/gmWZ" crossorigin="anonymous">
-   <script src="https://unpkg.com/formiojs@4.3.4/dist/formio.full.js"
-    integrity="sha384-R3JBdRxZL/+P8lKCGqu1n2cuVon6NTOk7z5xal9wVw0UMu3Kc/YK5gtrxsA9tUWS" crossorigin="anonymous">
-    </script>
-
-</script>
-    <script type='text/javascript'>
+   <link rel="stylesheet" href="<%- nodeModules %>/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="<%- nodeModules %>/formiojs/dist/formio.full.min.css">
+   <script src="<%- nodeModules %>/formiojs/dist/formio.full.js"></script>
+  
+       
+     <script type='text/javascript'>
       window.onload = function() {
-      Formio.plugins = [{
+   
+       Formio.plugins = [{
         priority: 0,
         preRequest: async function (requestArgs) {
             if (!requestArgs.opts) {
@@ -63,7 +60,7 @@ const template = `<!doctype html>
 
             }
         }]
-
+   
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
             readOnly: true,
        }).then(function(form) {
