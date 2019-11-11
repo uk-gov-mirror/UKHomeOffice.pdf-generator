@@ -125,7 +125,7 @@ if (cluster.isMaster) {
     const basePath = ``;
 
     const expressApp: Application = express();
-    expressApp.get("/tmp/:fileName", (req, res) => {
+    expressApp.get('/tmp/:fileName', (req, res) => {
         // @ts-ignore
         res.sendFile(`/tmp/${req.params.fileName}`);
     });
