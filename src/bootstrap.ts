@@ -125,7 +125,13 @@ if (cluster.isMaster) {
     const basePath = ``;
 
     const expressApp: Application = express();
+    expressApp.get("/tmp/:fileName", (req, res) => {
+        // @ts-ignore
+        res.sendFile(`/tmp/${req.params.fileName}`);
+    });
 
+    expressApp.use('/node_modules', express.static('./node_modules/'));
+    expressApp.use('/assets', express.static('./node_modules/govuk-frontend/govuk/assets'));
     const server = new InversifyExpressServer(container,
         null,
         {rootPath: basePath},

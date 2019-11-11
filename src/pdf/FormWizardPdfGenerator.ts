@@ -106,7 +106,7 @@ export class FormWizardPdfGenerator extends PdfGenerator {
                                     });
                             });
 
-                            await page.goto(`file://${htmlFileName}`,
+                            await page.goto(`http://localhost:${this.appConfig.port}${htmlFileName}`,
                                 {waitUntil: ['networkidle0', 'load', 'domcontentloaded'], timeout: 0});
 
                             await page.pdf({path: tempPath, format: 'A4'});

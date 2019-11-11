@@ -6,15 +6,16 @@ const template = `<!doctype html>
         page-break-after: always;
         page-break-inside: avoid;
       }
+   
 </style>
-   <link rel="stylesheet" href="<%- nodeModules %>/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="<%- nodeModules %>/formiojs/dist/formio.full.min.css">
-    <script src="<%- nodeModules %>/formiojs/dist/formio.full.js"></script>
 
-
-     <script type='text/javascript'>
+ <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/node_modules/formiojs/dist/formio.full.min.css">
+    <script src="/node_modules/formiojs/dist/formio.full.js"></script>
+    <script src="/node_modules/@digitalpatterns/formio-gds-template/dist/gds.js"></script>
+    <script type='text/javascript'>
       window.onload = function() {
-
+       Formio.use(gds); 
        Formio.plugins = [{
         priority: 0,
         preRequest: async function (requestArgs) {
@@ -37,9 +38,7 @@ const template = `<!doctype html>
             requestArgs.url = requestArgs.url.replace("_id", "id");
             return requestArgs;
         },
-    },
-
-        {
+    },{
             priority: 0,
             requestResponse: function (response) {
                 return {
@@ -60,17 +59,19 @@ const template = `<!doctype html>
 
             }
         }]
-
+      
+       
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
             readOnly: true,
        }).then(function(form) {
            form.submission =  <%- JSON.stringify(submission) %>
         });
       };
+   
     </script>
   </head>
   <body>
-    <div id='formio'></div>
+    <div id='formio' class="container"></div>
   </body>
 </html>`;
 
