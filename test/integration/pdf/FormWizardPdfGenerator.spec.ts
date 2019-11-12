@@ -10,14 +10,31 @@ import {FormWizardPdfGenerator} from "../../../src/pdf/FormWizardPdfGenerator";
 import {KeycloakService} from "../../../src/service/KeycloakService";
 
 
-describe('FormWizardPdfGenerator', () => {
 
+describe('FormWizardPdfGenerator', () => {
+    let server;
     const appConfig: AppConfig = defaultAppConfig;
     let formTemplateResolver: FormTemplateResolver;
     let s3Service: SubstituteOf<S3Service>;
     let formWizardPdfGenerator: FormWizardPdfGenerator;
     let keycloakService: SubstituteOf<KeycloakService>;
 
+    before(() => {
+        const express = require('express');
+        const app = express();
+        app.use('/tmp', express.static('/tmp/'));
+        server = app.listen(3000, function () {
+            const port = server.address().port;
+            console.log('Example app listening at port %s', port);
+        });
+    });
+
+    after((done) => {
+        server.close(() => {
+            console.log("Server closed");
+            done();
+        })
+    });
     beforeEach(() => {
         keycloakService = Substitute.for<KeycloakService>();
         formTemplateResolver = new FormTemplateResolver(keycloakService);

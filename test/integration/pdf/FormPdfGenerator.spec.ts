@@ -9,6 +9,8 @@ import {FormPdfGenerator} from "../../../src/pdf/FormPdfGenerator";
 import {basicForm} from "../../form";
 import {KeycloakService} from "../../../src/service/KeycloakService";
 
+
+
 describe('FormPdfGenerator', () => {
 
     const appConfig: AppConfig = defaultAppConfig;
@@ -17,11 +19,30 @@ describe('FormPdfGenerator', () => {
     let formPdfGenerator: FormPdfGenerator;
     let keycloakService: SubstituteOf<KeycloakService>;
 
+    let server;
+
     beforeEach(() => {
         keycloakService = Substitute.for<KeycloakService>();
         formTemplateResolver = new FormTemplateResolver(keycloakService);
         s3Service = Substitute.for<S3Service>();
         formPdfGenerator = new FormPdfGenerator(appConfig, formTemplateResolver, s3Service);
+    });
+
+    before(() => {
+        const express = require('express');
+        const app = express();
+        app.use('/tmp', express.static('/tmp/'));
+        server = app.listen(3000, function () {
+            const port = server.address().port;
+            console.log('Example app listening at port %s', port);
+        });
+    });
+
+    after((done) => {
+        server.close(() => {
+            console.log("Server closed");
+            done();
+        })
     });
 
     it('can generate pdf', async () => {
