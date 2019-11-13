@@ -2,9 +2,7 @@ const template = `<!doctype html>
 <html lang="en">
 
 <style type="text/css" media="print">
-      div.page
-      {
-        page-break-after: always;
+     * {
         page-break-inside: avoid;
       }
 
