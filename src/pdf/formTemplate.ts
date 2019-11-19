@@ -12,9 +12,10 @@ const template = `<!doctype html>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/node_modules/formiojs/dist/formio.full.min.css">
     <script src="/node_modules/formiojs/dist/formio.full.js"></script>
+    <script src="/node_modules/@digitalpatterns/formio-gds-template/dist/gds.js"></script>
     <script type='text/javascript'>
       window.onload = function() {
-
+       Formio.use(gds);
        Formio.plugins = [{
         priority: 0,
         preRequest: async function (requestArgs) {
