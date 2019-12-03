@@ -15,6 +15,7 @@ import Arena from 'bull-arena';
 import Keycloak, {Token} from 'keycloak-connect';
 import session from 'express-session';
 import httpContext from 'express-http-context';
+import * as bodyParser from 'body-parser';
 
 const totalHeapSize = v8.getHeapStatistics().total_available_size;
 const totalHeapSizeGb = (totalHeapSize / 1024 / 1024 / 1024).toFixed(2);
@@ -128,6 +129,14 @@ if (cluster.isMaster) {
     expressApp.use('/tmp', express.static('/tmp/'));
     expressApp.use('/node_modules', express.static('./node_modules/'));
     expressApp.use('/assets', express.static('./node_modules/govuk-frontend/govuk/assets'));
+    expressApp.use(bodyParser.json({
+        limit: '50mb',
+    }));
+    expressApp.use(bodyParser.urlencoded({
+        extended: true,
+        limit: '50mb',
+        parameterLimit: 50000,
+    }));
     const server = new InversifyExpressServer(container,
         null,
         {rootPath: basePath},
