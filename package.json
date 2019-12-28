@@ -103,7 +103,7 @@
     "typescript": "^3.5.2"
   },
   "dependencies": {
-    "@digitalpatterns/formio-gds-template": "^1.2.1",
+    "@digitalpatterns/formio-gds-template": "^1.2.5",
     "@hapi/joi": "^15.1.0",
     "@types/bluebird": "^3.5.27",
     "@types/bull": "^3.10.2",
@@ -152,7 +152,7 @@
     "morgan": "^1.9.1",
     "puppeteer": "^1.19.0",
     "reflect-metadata": "^0.1.13",
-    "type-cacheable": "^0.1.9",
+    "type-cacheable": "^2.0.0",
     "uninstall": "0.0.0",
     "uuid": "^3.3.2",
     "validator": "^11.0.0",
