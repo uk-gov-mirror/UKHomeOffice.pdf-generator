@@ -11,10 +11,13 @@ const template = `<!doctype html>
 </style>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/node_modules/formiojs/dist/formio.full.min.css">
+    <script src="/node_modules/axios/dist/axios.js"></script>
+
     <script src="/node_modules/formiojs/dist/formio.full.js"></script>
+    <script src="/node_modules/@digitalpatterns/formio-gds-template/dist/gds.js"></script>
     <script type='text/javascript'>
       window.onload = function() {
-
+       Formio.use(gds);
        Formio.plugins = [{
         priority: 0,
         preRequest: async function (requestArgs) {
@@ -65,6 +68,22 @@ const template = `<!doctype html>
             renderMode: 'form'
        }).then(function(form) {
            form.submission =  <%- JSON.stringify(submission) %>
+           form.on('componentError', function(error) {
+             var formName = form._form ? form._form.name : '';
+              var log = {
+                 'level': 'error',
+                 'message': error.message,
+                  'form': formName,
+                    'component': {
+                        'label': error.component.label,
+                        'key': error.component.key
+                    }
+              }
+              axios.post('/log', [log], {
+                'Content-Type': 'application/json'
+              })
+
+           });
         });
       };
 
