@@ -46,6 +46,7 @@ export class PdfProcessor {
             if (job.attemptsMade < job.opts.attempts) {
                 logger.warn(`PDF generation failed..retrying. Retry ${job.attemptsMade} of ${job.opts.attempts}`
                     , {
+                        error: error.message,
                         cluster: {
                             workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
                             jobId: job.id,
@@ -84,8 +85,8 @@ export class PdfProcessor {
         let schema;
         const formUrl = job.data.formUrl;
         if (formUrl) {
-            const accessToken = await this.kecycloakService.getAccessToken();
             try {
+                const accessToken = await this.kecycloakService.getAccessToken();
                 const response = await axiosInstance.get(formUrl, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
