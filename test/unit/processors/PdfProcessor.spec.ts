@@ -10,6 +10,8 @@ import {KeycloakService} from "../../../src/service/KeycloakService";
 import {FormWizardPdfGenerator} from "../../../src/pdf/FormWizardPdfGenerator";
 import {FormPdfGenerator} from "../../../src/pdf/FormPdfGenerator";
 import {PdfProcessor} from "../../../src/processors/PdfProcessor";
+// @ts-ignore
+import nock from "nock";
 
 describe('PDFProcessor', () => {
     let pdfQueue: SubstituteOf<Queue<PdfJob>>;
@@ -34,6 +36,99 @@ describe('PDFProcessor', () => {
             formWizardPdfGenerator,
             formPdfGenerator
         )
+    });
+
+    const settings = {
+        'grant_type': 'client_credentials',
+    };
+
+    it ('can handle version url', async() => {
+        const job: SubstituteOf<Job> = Substitute.for<Job>();
+
+        keycloakService.getAccessToken().returns(Promise.resolve('access-token-generated'))
+        nock('http://localhost:3241', {
+            reqheaders: {
+                'Authorization' : 'Bearer access-token-generated'
+            }
+        }).log(console.log)
+            .get('/form/version/1234132')
+            .reply(200, {
+                schema: {
+                    name: 'apples',
+                    display: 'form',
+                    components: [{
+                        key: 'name'
+                    }]
+                }
+            });
+
+        job.data.returns({
+            formUrl: 'http://localhost:3241/form/version/1234132',
+            webhookUrl: 'test',
+            submission: {
+                data: {
+                    name: 'test'
+                }
+            }
+        });
+
+        formPdfGenerator.generatePdf(Arg.any(), Arg.any()).returns(Promise.resolve({
+            message: 'test',
+            fileLocation: 'fileLocation',
+            etag: 'etag',
+            fileName: 'fileName'
+        }));
+
+        const webhookJob: SubstituteOf<Job<WebhookJob>> = Substitute.for<Job<WebhookJob>>();
+
+        webhookQueue.add(Arg.all()).returns(Promise.resolve(webhookJob));
+        const result: Promise<Job<WebhookJob>> = await pdfProcessor.handlePdf(job);
+        expect(result).to.be.not.null;
+
+
+    });
+    it ('can handle non version url', async() => {
+        const job: SubstituteOf<Job> = Substitute.for<Job>();
+
+        keycloakService.getAccessToken().returns(Promise.resolve('access-token-generated'))
+        nock('http://localhost:3241', {
+            reqheaders: {
+                'Authorization' : 'Bearer access-token-generated'
+            }
+        }).log(console.log)
+            .get('/form/name/apples')
+            .reply(200, {
+                name: 'apples',
+                display: 'form',
+                components: [{
+                    key: 'name'
+                }]
+            });
+
+        job.data.returns({
+            formUrl: 'http://localhost:3241/form/name/apples',
+            webhookUrl: 'test',
+            submission: {
+                data: {
+                    name: 'test'
+                }
+            }
+        });
+
+        formPdfGenerator.generatePdf(Arg.any(), Arg.any()).returns(Promise.resolve({
+            message: 'test',
+            fileLocation: 'fileLocation',
+            etag: 'etag',
+            fileName: 'fileName'
+        }));
+
+        const webhookJob: SubstituteOf<Job<WebhookJob>> = Substitute.for<Job<WebhookJob>>();
+
+        webhookQueue.add(Arg.all()).returns(Promise.resolve(webhookJob));
+        const result: Promise<Job<WebhookJob>> = await pdfProcessor.handlePdf(job);
+        expect(result).to.be.not.null;
+
+
     });
 
     it('can handle successful pdf', async () => {

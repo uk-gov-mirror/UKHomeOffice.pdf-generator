@@ -89,10 +89,16 @@ export class PdfProcessor {
                 const accessToken = await this.kecycloakService.getAccessToken();
                 const response = await axiosInstance.get(formUrl, {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type' : 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
                     },
                 });
-                schema = response.data;
+                if ('schema' in response.data) {
+                    schema = response.data.schema;
+                } else {
+                    schema = response.data;
+                }
+
             } catch (e) {
                 logger.error(`Failed to load form for ${formUrl}`, {
                     error: e.message,
