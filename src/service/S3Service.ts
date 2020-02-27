@@ -6,6 +6,7 @@ import logger from '../util/logger';
 import * as fs from 'fs';
 import S3 from 'aws-sdk/clients/s3';
 import cluster from 'cluster';
+import S3Params from "../interfaces/S3Params";
 
 @provide(TYPE.S3Service)
 export class S3Service {
@@ -30,28 +31,33 @@ export class S3Service {
     }
 
     public async uploadError(bucketName: string, filePath: string, key: string) {
-        const params = {
+        const params: S3Params = {
             Bucket: bucketName,
             Key: key,
             Body: fs.readFileSync(filePath),
             ContentType: 'image/png',
-            ServerSideEncryption: 'aws:kms',
-            SSEKMSKeyId: this.s3Config.kmsKey,
         };
+        if (this.s3Config.kmsKey) {
+            params.ServerSideEncryption = 'aws:kms';
+            params.SSEKMSKeyId = this.s3Config.kmsKey;
+        }
         return this.uploadToS3(params);
     }
+
     public async upload(bucketName: string,
                         file: Buffer,
                         objectName: string): Promise<{ location, etag }> {
 
-        const params = {
+        const params: S3Params = {
             Bucket: bucketName,
             Key: objectName,
             Body: file,
             ContentType: 'application/pdf',
-            ServerSideEncryption: 'aws:kms',
-            SSEKMSKeyId: this.s3Config.kmsKey,
         };
+        if (this.s3Config.kmsKey) {
+            params.ServerSideEncryption = 'aws:kms';
+            params.SSEKMSKeyId = this.s3Config.kmsKey;
+        }
 
         return this.uploadToS3(params);
     }
@@ -60,19 +66,21 @@ export class S3Service {
                             filePath: string,
                             objectName: string): Promise<{ location, etag }> {
 
-        const params = {
+        const params: S3Params = {
             Bucket: bucketName,
             Key: objectName,
             Body: fs.readFileSync(filePath),
             ContentType: 'application/pdf',
-            ServerSideEncryption: 'aws:kms',
-            SSEKMSKeyId: this.s3Config.kmsKey,
         };
+        if (this.s3Config.kmsKey) {
+            params.ServerSideEncryption = 'aws:kms';
+            params.SSEKMSKeyId = this.s3Config.kmsKey;
+        }
 
         return this.uploadToS3(params);
     }
 
-    private uploadToS3(params): Promise<{ location, etag }> {
+    private uploadToS3(params: S3Params): Promise<{ location, etag }> {
         return new Promise((resolve, reject) => {
             this.s3.putObject(params, (err, data) => {
                 if (err) {

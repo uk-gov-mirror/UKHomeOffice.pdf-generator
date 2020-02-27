@@ -5,6 +5,7 @@ import * as AWSMock from "aws-sdk-mock";
 import {S3Service} from "../../../src/service/S3Service";
 import defaultAppConfig from "../../../src/config/defaultAppConfig";
 import {PutObjectRequest} from "aws-sdk/clients/mediastoredata";
+// @ts-ignore
 import fs from 'fs';
 
 AWS.config.paramValidation = false;
