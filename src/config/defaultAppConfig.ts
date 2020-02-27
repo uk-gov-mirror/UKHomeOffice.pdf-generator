@@ -58,7 +58,7 @@ const defaultAppConfig: AppConfig = {
             buckets: {
                 pdf: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME || 'pdf',
             },
-            region: PDF_GENERATOR_AWS_S3_REGION || '',
+            region: PDF_GENERATOR_AWS_S3_REGION || 'eu-west-2',
             useSSL: true,
             port: +PDF_GENERATOR_AWS_S3_PORT,
             accessKey: PDF_GENERATOR_AWS_S3_ACCESS_KEY,
