@@ -6,7 +6,7 @@ import logger from '../util/logger';
 import * as fs from 'fs';
 import S3 from 'aws-sdk/clients/s3';
 import cluster from 'cluster';
-import S3Params from "../interfaces/S3Params";
+import S3Params from '../interfaces/S3Params';
 
 @provide(TYPE.S3Service)
 export class S3Service {
