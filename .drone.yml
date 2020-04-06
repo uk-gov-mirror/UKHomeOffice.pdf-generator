@@ -156,7 +156,7 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
     when:
-      event: deployment
+      event: push
       branch: master
 
 
