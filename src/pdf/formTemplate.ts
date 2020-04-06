@@ -5,7 +5,11 @@ const template = `<!doctype html>
      * {
         page-break-inside: avoid;
       }
-
+    body {
+      overscroll-behavior-y: none;
+      font-family: "nta", Arial, sans-serif;
+     }
+}
 </style>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/node_modules/formiojs/dist/formio.full.min.css">
@@ -62,8 +66,7 @@ const template = `<!doctype html>
 
 
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
-            readOnly: true,
-            renderMode: 'form'
+            readOnly: true
        }).then(function(form) {
            form.submission =  <%- JSON.stringify(submission) %>
            form.on('componentError', function(error) {
