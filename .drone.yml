@@ -22,7 +22,7 @@ pipeline:
         target: AWS_ACCESS_KEY_ID
       - source: DEV_DRONE_AWS_SECRET_ACCESS_KEY
         target: AWS_SECRET_ACCESS_KEY
-      - source: DRONE_PRIVATE_TOKEN
+      - source: DRONE_PUBLIC_TOKEN
         target: DRONE_TOKEN
     when:
       environment: secrets
@@ -38,7 +38,7 @@ pipeline:
         target: AWS_ACCESS_KEY_ID
       - source: STAGING_DRONE_AWS_SECRET_ACCESS_KEY
         target: AWS_SECRET_ACCESS_KEY
-      - source: DRONE_PRIVATE_TOKEN
+      - source: DRONE_PUBLIC_TOKEN
         target: DRONE_TOKEN
     when:
       environment: secrets
@@ -54,7 +54,7 @@ pipeline:
         target: AWS_ACCESS_KEY_ID
       - source: PRODUCTION_DRONE_AWS_SECRET_ACCESS_KEY
         target: AWS_SECRET_ACCESS_KEY
-      - source: DRONE_PRIVATE_TOKEN
+      - source: DRONE_PUBLIC_TOKEN
         target: DRONE_TOKEN
     when:
       environment: secrets
