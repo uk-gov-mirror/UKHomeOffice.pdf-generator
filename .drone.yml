@@ -16,6 +16,7 @@ pipeline:
     image: quay.io/ukhomeofficedigital/cop-secrets
     environment:
       - DRONE_SERVER=https://drone-gitlab.acp.homeoffice.gov.uk
+      - DEPLOY_ENV=dev
     secrets:
       - source: DEV_DRONE_AWS_ACCESS_KEY_ID
         target: AWS_ACCESS_KEY_ID
@@ -24,7 +25,40 @@ pipeline:
       - source: DRONE_PRIVATE_TOKEN
         target: DRONE_TOKEN
     when:
-       event: push
+      environment: secrets
+      event: deployment
+
+  synch_staging_secrets:
+    image: quay.io/ukhomeofficedigital/cop-secrets
+    environment:
+      - DRONE_SERVER=https://drone-gitlab.acp.homeoffice.gov.uk
+      - DEPLOY_ENV=staging
+    secrets:
+      - source: STAGING_DRONE_AWS_ACCESS_KEY_ID
+        target: AWS_ACCESS_KEY_ID
+      - source: STAGING_DRONE_AWS_SECRET_ACCESS_KEY
+        target: AWS_SECRET_ACCESS_KEY
+      - source: DRONE_PRIVATE_TOKEN
+        target: DRONE_TOKEN
+    when:
+      environment: secrets
+      event: deployment
+
+  synch_production_secrets:
+    image: quay.io/ukhomeofficedigital/cop-secrets
+    environment:
+      - DRONE_SERVER=https://drone-gitlab.acp.homeoffice.gov.uk
+      - DEPLOY_ENV=production
+    secrets:
+      - source: PRODUCTION_DRONE_AWS_ACCESS_KEY_ID
+        target: AWS_ACCESS_KEY_ID
+      - source: PRODUCTION_DRONE_AWS_SECRET_ACCESS_KEY
+        target: AWS_SECRET_ACCESS_KEY
+      - source: DRONE_PRIVATE_TOKEN
+        target: DRONE_TOKEN
+    when:
+      environment: secrets
+      event: deployment
 
   build:
     image: quay.io/ukhomeofficedigital/drone-docker
@@ -44,20 +78,221 @@ pipeline:
       branch: master
       event: push
 
-  build_push_to_ecr:
-    image: quay.io/ukhomeofficedigital/ecr:latest
+  image_to_quay:
+    image: quay.io/ukhomeofficedigital/drone-docker
     secrets:
-    - source: PDF_GENERATOR_AWS_ACCESS_KEY_ID
-      target: AWS_ACCESS_KEY_ID
-    - source: PDF_GENERATOR_AWS_SECRET_ACCESS_KEY
-      target: AWS_SECRET_ACCESS_KEY
-    repo: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/cop/pdf-generator
-    tags:
-      - ${DRONE_COMMIT_SHA}
-      - latest
+    - source: QUAY_USERNAME
+      target: DOCKER_USERNAME
+    - source: QUAY_PASSWORD
+      target: DOCKER_PASSWORD
+    registry: quay.io
+    repo: quay.io/ukhomeofficedigital/cop-pdf-generator
+    tags: ${DRONE_COMMIT_SHA}
     when:
       branch: master
       event: push
+
+  deploy_to_dev:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - source: DEV_KEYCLOAK_REALM
+        target: KEYCLOAK_REALM
+      - source: DEV_KEYCLOAK_URL
+        target: KEYCLOAK_URL
+      - source: DEV_KUBE_NAMESPACE_PRIVATE_COP
+        target: KUBE_NAMESPACE
+      - source: DEV_KUBE_SERVER
+        target: KUBE_SERVER
+      - source: DEV_KUBE_TOKEN
+        target: KUBE_TOKEN
+      - source: DEV_PDF_GENERATOR_ARENA_ACCESS_ROLES
+        target: PDF_GENERATOR_ARENA_ACCESS_ROLES
+      - source: DEV_PDF_GENERATOR_ARENA_PORT
+        target: PDF_GENERATOR_ARENA_PORT
+      - source: DEV_PDF_GENERATOR_AWS_S3_ACCESS_KEY
+        target: PDF_GENERATOR_AWS_S3_ACCESS_KEY
+      - source: DEV_PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+        target: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+      - source: DEV_PDF_GENERATOR_AWS_S3_SECRET_KEY
+        target: PDF_GENERATOR_AWS_S3_SECRET_KEY
+      - source: DEV_PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+        target: PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+      - source: DEV_PDF_GENERATOR_IMAGE
+        target: PDF_GENERATOR_IMAGE
+      - source: DEV_PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+      - source: DEV_PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+      - source: DEV_PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+      - source: LOG_LEVEL_INFO
+        target: PDF_GENERATOR_LOG_LEVEL
+      - source: DEV_PDF_GENERATOR_NAME
+        target: PDF_GENERATOR_NAME
+      - source: DEV_PDF_GENERATOR_PORT
+        target: PDF_GENERATOR_PORT
+      - source: DEV_REDIS_TOKEN
+        target: REDIS_TOKEN
+      - source: DEV_REDIS_URL
+        target: REDIS_URL
+      - source: DEV_REDIS_SSL
+        target: REDIS_SSL
+      - source: DEV_REDIS_PORT
+        target: REDIS_PORT
+      - source: PDF_GENERATOR_AWS_S3_ENDPOINT
+        target: PDF_GENERATOR_AWS_S3_ENDPOINT
+      - source: PDF_GENERATOR_AWS_S3_PORT
+        target: PDF_GENERATOR_AWS_S3_PORT
+      - source: PDF_GENERATOR_AWS_S3_REGION
+        target: PDF_GENERATOR_AWS_S3_REGION
+      - source: PROTOCOL_HTTPS
+        target: PDF_GENERATOR_AWS_S3_PROTOCOL
+      - source: PROTOCOL_HTTPS
+        target: KEYCLOAK_PROTOCOL
+    commands:
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      event: deployment
+      environment: dev
+      branch: master
+
+
+  deploy_to_staging:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - source: LOG_LEVEL_INFO
+        target: PDF_GENERATOR_LOG_LEVEL
+      - source: PDF_GENERATOR_AWS_S3_ENDPOINT
+        target: PDF_GENERATOR_AWS_S3_ENDPOINT
+      - source: PDF_GENERATOR_AWS_S3_PORT
+        target: PDF_GENERATOR_AWS_S3_PORT
+      - source: PDF_GENERATOR_AWS_S3_REGION
+        target: PDF_GENERATOR_AWS_S3_REGION
+      - source: PROTOCOL_HTTPS
+        target: PDF_GENERATOR_AWS_S3_PROTOCOL
+      - source: PROTOCOL_HTTPS
+        target: KEYCLOAK_PROTOCOL
+      - source: STAGING_KEYCLOAK_REALM
+        target: KEYCLOAK_REALM
+      - source: STAGING_KEYCLOAK_URL
+        target: KEYCLOAK_URL
+      - source: STAGING_KUBE_NAMESPACE_PRIVATE_COP
+        target: KUBE_NAMESPACE
+      - source: STAGING_KUBE_SERVER
+        target: KUBE_SERVER
+      - source: STAGING_KUBE_TOKEN
+        target: KUBE_TOKEN
+      - source: STAGING_PDF_GENERATOR_ARENA_ACCESS_ROLES
+        target: PDF_GENERATOR_ARENA_ACCESS_ROLES
+      - source: STAGING_PDF_GENERATOR_ARENA_PORT
+        target: PDF_GENERATOR_ARENA_PORT
+      - source: STAGING_PDF_GENERATOR_AWS_S3_ACCESS_KEY
+        target: PDF_GENERATOR_AWS_S3_ACCESS_KEY
+      - source: STAGING_PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+        target: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+      - source: STAGING_PDF_GENERATOR_AWS_S3_SECRET_KEY
+        target: PDF_GENERATOR_AWS_S3_SECRET_KEY
+      - source: STAGING_PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+        target: PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+      - source: STAGING_PDF_GENERATOR_IMAGE
+        target: PDF_GENERATOR_IMAGE
+      - source: STAGING_PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+      - source: STAGING_PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+      - source: STAGING_PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+      - source: STAGING_PDF_GENERATOR_NAME
+        target: PDF_GENERATOR_NAME
+      - source: STAGING_PDF_GENERATOR_PORT
+        target: PDF_GENERATOR_PORT
+      - source: STAGING_REDIS_PORT
+        target: REDIS_PORT
+      - source: STAGING_REDIS_SSL
+        target: REDIS_SSL
+      - source: STAGING_REDIS_TOKEN
+        target: REDIS_TOKEN
+      - source: STAGING_REDIS_URL
+        target: REDIS_URL
+    commands:
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      event: deployment
+      environment: staging
+      branch: master
+
+  deploy_to_production:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - source: LOG_LEVEL_INFO
+        target: PDF_GENERATOR_LOG_LEVEL
+      - source: PDF_GENERATOR_AWS_S3_ENDPOINT
+        target: PDF_GENERATOR_AWS_S3_ENDPOINT
+      - source: PDF_GENERATOR_AWS_S3_PORT
+        target: PDF_GENERATOR_AWS_S3_PORT
+      - source: PDF_GENERATOR_AWS_S3_REGION
+        target: PDF_GENERATOR_AWS_S3_REGION
+      - source: PRODUCTION_KEYCLOAK_REALM
+        target: KEYCLOAK_REALM
+      - source: PRODUCTION_KEYCLOAK_URL
+        target: KEYCLOAK_URL
+      - source: PRODUCTION_KUBE_NAMESPACE_PRIVATE_COP
+        target: KUBE_NAMESPACE
+      - source: PRODUCTION_KUBE_SERVER
+        target: KUBE_SERVER
+      - source: PRODUCTION_KUBE_TOKEN
+        target: KUBE_TOKEN
+      - source: PRODUCTION_PDF_GENERATOR_ARENA_ACCESS_ROLES
+        target: PDF_GENERATOR_ARENA_ACCESS_ROLES
+      - source: PRODUCTION_PDF_GENERATOR_ARENA_PORT
+        target: PDF_GENERATOR_ARENA_PORT
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_ACCESS_KEY
+        target: PDF_GENERATOR_AWS_S3_ACCESS_KEY
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+        target: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_SECRET_KEY
+        target: PDF_GENERATOR_AWS_S3_SECRET_KEY
+      - source: PRODUCTION_PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+        target: PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+      - source: PRODUCTION_PDF_GENERATOR_IMAGE
+        target: PDF_GENERATOR_IMAGE
+      - source: PRODUCTION_PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+      - source: PRODUCTION_PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+      - source: PRODUCTION_PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+      - source: PRODUCTION_PDF_GENERATOR_NAME
+        target: PDF_GENERATOR_NAME
+      - source: PRODUCTION_PDF_GENERATOR_PORT
+        target: PDF_GENERATOR_PORT
+      - source: PROTOCOL_HTTPS
+        target: PDF_GENERATOR_AWS_S3_PROTOCOL
+      - source: PROTOCOL_HTTPS
+        target: KEYCLOAK_PROTOCOL
+      - source: PRODUCTION_REDIS_PORT
+        target: REDIS_PORT
+      - source: PRODUCTION_REDIS_SSL
+        target: REDIS_SSL
+      - source: PRODUCTION_REDIS_TOKEN
+        target: REDIS_TOKEN
+      - source: PRODUCTION_REDIS_URL
+        target: REDIS_URL
+    commands:
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      event: deployment
+      environment: production
+      branch: master
 
   notify:
     image: plugins/slack
