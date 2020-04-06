@@ -21,6 +21,9 @@ export class EmptySubmissionFormProcessor {
                 if (component.type === 'panel') {
                     component.customClass += ' page';
                 }
+                if (component.type === 'textarea') {
+                    component.customClass += ' govuk-textarea';
+                }
                 if (!path) {
                     return;
                 }
