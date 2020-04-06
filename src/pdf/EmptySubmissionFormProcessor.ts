@@ -7,7 +7,6 @@ export class EmptySubmissionFormProcessor {
 
     public processEmptyContent(schema: any, submission: any): any[] {
         const cleanedPanels = new Set();
-
         const panels: any[] = util.searchComponents(schema.components, {
             type: 'panel',
         });
