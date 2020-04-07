@@ -150,13 +150,13 @@ pipeline:
       - source: PROTOCOL_HTTPS
         target: KEYCLOAK_PROTOCOL
     commands:
+      - export PDF_GENERATOR_TAG=$${DRONE_COMMIT_SHA}
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
     when:
-      event: deployment
-      environment: dev
+      event: push
       branch: master
 
 
@@ -218,6 +218,7 @@ pipeline:
       - source: STAGING_REDIS_URL
         target: REDIS_URL
     commands:
+      - export PDF_GENERATOR_TAG=$${DRONE_COMMIT_SHA}
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
@@ -285,6 +286,7 @@ pipeline:
       - source: PRODUCTION_REDIS_URL
         target: REDIS_URL
     commands:
+      - export PDF_GENERATOR_TAG=$${DRONE_COMMIT_SHA}
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
