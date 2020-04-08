@@ -2,7 +2,13 @@ const template = `<!doctype html>
 <html lang="en">
 
 <style type="text/css" media="print">
-     * {
+     .govuk-textarea,
+     .govuk-input,
+     .govuk-select,
+     .govuk-checkboxes_item,
+     .govuk-checkboxes,
+     .govuk-date-input,
+     .govuk-radios {
         page-break-inside: avoid;
       }
     body {
@@ -66,7 +72,7 @@ const template = `<!doctype html>
 
 
        Formio.createForm(document.getElementById('formio'),  <%- JSON.stringify(formSchema) %>, {
-            readOnly: true
+            readOnly: true,
        }).then(function(form) {
            form.submission =  <%- JSON.stringify(submission) %>
            form.on('componentError', function(error) {

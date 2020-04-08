@@ -30,14 +30,8 @@ export class EmptySubmissionFormProcessor {
                 const jsonPath = `$.${path}`;
                 try {
                     const data = JSONPath.value(submission.data ? submission.data : {}, jsonPath);
-                    if (Array.isArray(data)) {
-                        data.map((item) => {
-                            this.handleEmptyData(component.components, item, cleanedPanels);
-                        });
-                    } else {
-                        if (!_.isEmpty(data)) {
-                            cleanedPanels.add(panel);
-                        }
+                    if (!_.isEmpty(data)) {
+                        cleanedPanels.add(panel);
                     }
                 } catch (e) {
                     logger.error(e);
