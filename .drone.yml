@@ -4,7 +4,7 @@ pipeline:
   #     image: digitalpatterns/node:latest
   #     commands:
   #       - yum install -y libX11-devel libX11-common libXcomposite libXcursor libXdamage libXext libXi libXtst cups-libs libXScrnSaver libXrandr alsa-lib atk at-spi2-atk cairo pango gtk3 java-1.8.0-openjdk
-  #       - npm install
+  #       - npm ci
   #       - npm run build-ts
   #       - npm run test
   #     when:
