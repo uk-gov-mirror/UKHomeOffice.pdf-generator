@@ -47,7 +47,7 @@ export class WebhookProcessor {
                 logger.error(`Web-hook job failed for ${job.data.url} after max retries.`,
                     {error: error.stack});
                 try {
-                    await job.remove();
+                    await job.finished();
                     logger.info('Removed job from webhook queue');
                 } catch (e) {
                     logger.warn(e.message);
