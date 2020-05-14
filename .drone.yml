@@ -311,5 +311,5 @@ pipeline:
       {{/build.deployTo}}
     when:
       branch: master
-      event: push
+      event: [ push, deployment ]
       status: [ success, failure ]
