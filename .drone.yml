@@ -125,7 +125,7 @@ pipeline:
         target: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
       - source: DEV_PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
         target: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
-      - source: LOG_LEVEL_INFO
+      - source: LOG_LEVEL_DEBUG
         target: PDF_GENERATOR_LOG_LEVEL
       - source: DEV_PDF_GENERATOR_NAME
         target: PDF_GENERATOR_NAME
