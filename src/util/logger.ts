@@ -17,6 +17,7 @@ const addUserId = winston.format((info) => {
 });
 
 const logger = createLogger({
+    level: defaultAppConfig.logLevel,
     format: combine(
         addXRequestId(),
         addUserId(),

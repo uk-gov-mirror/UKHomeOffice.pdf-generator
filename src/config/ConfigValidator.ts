@@ -20,6 +20,7 @@ export class ConfigValidator {
                 port: Joi.number(),
                 accessRoles: Joi.array().items(Joi.string()).optional(),
             }),
+            logLevel: Joi.string().optional(),
             port: Joi.number().optional(),
             redis: Joi.object().keys({
                 port: Joi.number(),
