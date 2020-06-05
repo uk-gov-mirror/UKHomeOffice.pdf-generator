@@ -1,4 +1,5 @@
 interface AppConfig {
+    logLevel: string;
     port: number;
     keycloak: {
         sessionSecret: string,

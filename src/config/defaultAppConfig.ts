@@ -5,6 +5,7 @@ const DEFAULT_REDIS_PORT = 6379;
 const DEFAULT_PORT: number = 3000;
 
 const {
+    PDF_GENERATOR_LOG_LEVEL,
     PDF_GENERATOR_PORT,
     KEYCLOAK_URI,
     PDF_GENERATOR_KEYCLOAK_CLIENT_ID,
@@ -29,6 +30,7 @@ const {
 } = process.env;
 
 const defaultAppConfig: AppConfig = {
+    logLevel: PDF_GENERATOR_LOG_LEVEL || 'info',
     port: PDF_GENERATOR_PORT ? +PDF_GENERATOR_PORT : DEFAULT_PORT,
     arena: {
         port: +PDF_GENERATOR_ARENA_PORT,
