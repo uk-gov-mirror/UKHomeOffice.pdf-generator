@@ -17,7 +17,6 @@ const addUserId = winston.format((info) => {
 });
 
 const logger = createLogger({
-    level: defaultAppConfig.logLevel,
     format: combine(
         addXRequestId(),
         addUserId(),
@@ -31,7 +30,7 @@ const logger = createLogger({
     defaultMeta: {service: ApplicationConstants.SERVICE_NAME},
     transports: [
         new transports.Console({
-            level: 'info',
+            level: defaultAppConfig.logLevel,
         }),
     ],
     exitOnError: false,
