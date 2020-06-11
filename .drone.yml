@@ -206,11 +206,11 @@ pipeline:
         target: REDIS_SSL
       - source: DEV_REDIS_EFORMS_PORT
         target: REDIS_PORT
-      - source: DEV_PDF_GENERATOR_EFORMS_AWS_S3_ENDPOINT
+      - source: DEV_PDF_GENERATOR_AWS_S3_ENDPOINT
         target: PDF_GENERATOR_AWS_S3_ENDPOINT
-      - source: DEV_PDF_GENERATOR_EFORMS_AWS_S3_PORT
+      - source: DEV_PDF_GENERATOR_AWS_S3_PORT
         target: PDF_GENERATOR_AWS_S3_PORT
-      - source: DEV_PDF_GENERATOR_EFORMS_AWS_S3_REGION
+      - source: DEV_PDF_GENERATOR_AWS_S3_REGION
         target: PDF_GENERATOR_AWS_S3_REGION
       - source: PROTOCOL_HTTPS
         target: PDF_GENERATOR_AWS_S3_PROTOCOL
@@ -222,7 +222,6 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
-    when:
     when:
       event: push
       branch: master
@@ -352,6 +351,74 @@ pipeline:
         target: REDIS_TOKEN
       - source: PRODUCTION_REDIS_URL
         target: REDIS_URL
+    commands:
+      - export PDF_GENERATOR_TAG=$${DRONE_COMMIT_SHA}
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      event: deployment
+      environment: production
+      branch: master
+
+  deploy_to_production_eforms:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - source: PRODUCTION_KEYCLOAK_REALM
+        target: KEYCLOAK_REALM
+      - source: PRODUCTION_KEYCLOAK_URL
+        target: KEYCLOAK_URL
+      - source: PRODUCTION_KUBE_NAMESPACE_COP_EFORMS
+        target: KUBE_NAMESPACE
+      - source: PRODUCTION_KUBE_SERVER
+        target: KUBE_SERVER
+      - source: PRODUCTION_EFORMS_KUBE_TOKEN
+        target: KUBE_TOKEN
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_ARENA_ACCESS_ROLES
+        target: PDF_GENERATOR_ARENA_ACCESS_ROLES
+      - source: PRODUCTION_PDF_GENERATOR_ARENA_PORT
+        target: PDF_GENERATOR_ARENA_PORT
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_AWS_S3_ACCESS_KEY
+        target: PDF_GENERATOR_AWS_S3_ACCESS_KEY
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_AWS_S3_PDF_BUCKETNAME
+        target: PDF_GENERATOR_AWS_S3_PDF_BUCKETNAME
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_AWS_S3_SECRET_KEY
+        target: PDF_GENERATOR_AWS_S3_SECRET_KEY
+      - source: PRODUCTION_PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+        target: PDF_GENERATOR_CORRELATION_ID_REQUEST_HEADER
+      - source: PRODUCTION_PDF_GENERATOR_IMAGE
+        target: PDF_GENERATOR_IMAGE
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_KEYCLOAK_CLIENT_ID
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_ID
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_KEYCLOAK_CLIENT_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_CLIENT_SECRET
+      - source: PRODUCTION_PDF_GENERATOR_EFORMS_KEYCLOAK_SESSION_SECRET
+        target: PDF_GENERATOR_KEYCLOAK_SESSION_SECRET
+      - source: LOG_LEVEL_INFO
+        target: PDF_GENERATOR_LOG_LEVEL
+      - source: PRODUCTION_PDF_GENERATOR_NAME
+        target: PDF_GENERATOR_NAME
+      - source: PRODUCTION_PDF_GENERATOR_PORT
+        target: PDF_GENERATOR_PORT
+      - source: PRODUCTION_REDIS_EFORMS_TOKEN
+        target: REDIS_TOKEN
+      - source: PRODUCTION_REDIS_EFORMS_URL
+        target: REDIS_URL
+      - source: PRODUCTION_REDIS_EFORMS_SSL
+        target: REDIS_SSL
+      - source: PRODUCTION_REDIS_EFORMS_PORT
+        target: REDIS_PORT
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_ENDPOINT
+        target: PDF_GENERATOR_AWS_S3_ENDPOINT
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_PORT
+        target: PDF_GENERATOR_AWS_S3_PORT
+      - source: PRODUCTION_PDF_GENERATOR_AWS_S3_REGION
+        target: PDF_GENERATOR_AWS_S3_REGION
+      - source: PROTOCOL_HTTPS
+        target: PDF_GENERATOR_AWS_S3_PROTOCOL
+      - source: PROTOCOL_HTTPS
+        target: KEYCLOAK_PROTOCOL
     commands:
       - export PDF_GENERATOR_TAG=$${DRONE_COMMIT_SHA}
       - kd --insecure-skip-tls-verify -f kube/service.yml
