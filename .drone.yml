@@ -427,7 +427,7 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
     when:
       event: deployment
-      environment: production
+      environment: production_eforms
       branch: master
 
   notify:
