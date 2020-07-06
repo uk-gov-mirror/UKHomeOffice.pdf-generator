@@ -15,6 +15,9 @@ const template = `<!doctype html>
       overscroll-behavior-y: none;
       font-family: "nta", Arial, sans-serif;
      }
+    div[ref="details"] div[ref="input"] {
+      white-space: pre-wrap;
+    }
 }
 </style>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
