@@ -14,7 +14,6 @@ const template = `<!doctype html>
     body {
       overscroll-behavior-y: none;
       font-family: "nta", Arial, sans-serif;
-      white-space: pre-wrap;
      }
 }
 </style>
