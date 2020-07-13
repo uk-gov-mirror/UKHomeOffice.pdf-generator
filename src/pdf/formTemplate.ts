@@ -2,7 +2,6 @@ const template = `<!doctype html>
 <html lang="en">
 
 <style type="text/css" media="print">
-     .govuk-textarea,
      .govuk-input,
      .govuk-select,
      .govuk-checkboxes_item,
@@ -14,6 +13,9 @@ const template = `<!doctype html>
     body {
       overscroll-behavior-y: none;
       font-family: "nta", Arial, sans-serif;
+     }
+     .govuk-textarea div {
+        white-space: pre-wrap;
      }
 }
 </style>
