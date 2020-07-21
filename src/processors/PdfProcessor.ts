@@ -60,7 +60,7 @@ export class PdfProcessor {
                         error: error.stack,
                     },
                 });
-                await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
+                await this.webhookQueue.add(success, {attempts: 10, backoff: 10000});
                 logger.warn('Failed job notified via web-hook', {
                     cluster: {
                         workerId: cluster.worker ? cluster.worker.id : 'non-cluster',
@@ -142,7 +142,7 @@ export class PdfProcessor {
                     fileName: result.fileName,
                 },
             });
-            return await this.webhookQueue.add(success, {attempts: 5, backoff: 5000});
+            return await this.webhookQueue.add(success, {attempts: 10, backoff: 10000});
         } catch (error) {
             logger.error('Failed to create pdf', {
                 businessKey: formSubmission.data.businessKey,
