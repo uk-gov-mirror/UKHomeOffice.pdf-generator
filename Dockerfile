@@ -1,18 +1,79 @@
-FROM digitalpatterns/node:latest AS build
+FROM node:lts-alpine as build
 COPY . /src
 WORKDIR /src
-RUN yum install -y libX11-devel libX11-common libXcomposite libXcursor libXdamage libXext libXi libXtst cups-libs libXScrnSaver libXrandr alsa-lib atk at-spi2-atk cairo pango gtk3 java-1.8.0-openjdk
-RUN npm ci
-RUN npm run build-ts
-RUN npm prune --production
+RUN set -eux ; \
+  apk update ; \
+  apk add --no-cache \
+  libx11 \
+  libx11-dev \
+  libx11-static \
+  libxcomposite \
+  libxcursor \
+  libxdamage \
+  libxext \
+  libxi \
+  libxtst \
+  cups-libs \
+  libxscrnsaver \
+  libxrandr \
+  alsa-lib \
+  atk \
+  at-spi2-atk \
+  cairo \
+  pango \
+  gtk+3.0 \
+  openjdk8 \
+  py2-pip \
+  bash \
+  libc6-compat \
+  gcompat \
+  libgcc \
+  libstdc++6 \
+  libstdc++ \
+  build-base \
+  libtool \
+  autoconf \
+  automake \
+  libexecinfo-dev \
+  git \
+  python ; \
+  rm -rf /var/cache/apk/* ; \
+  npm ci ; \
+  npm run build-ts ; \
+  npm prune --production
 
 
-FROM digitalpatterns/node:latest
-RUN yum install -y libX11-devel libX11-common libXcomposite libXcursor libXdamage libXext libXi libXtst cups-libs libXScrnSaver libXrandr alsa-lib atk at-spi2-atk cairo pango gtk3 java-1.8.0-openjdk redis stunnel
+FROM node:lts-alpine as pdf-generator
+RUN set -eux ; \
+  apk update ; \
+  apk add --no-cache \
+  libx11 \
+  libx11-dev \
+  libx11-static \
+  libxcomposite \
+  libxcursor \
+  libxdamage \
+  libxext \
+  libxi \
+  libxtst \
+  cups-libs \
+  libxscrnsaver \
+  libxrandr \
+  alsa-lib \
+  atk \
+  at-spi2-atk \
+  cairo \
+  pango \
+  gtk+3.0 \
+  openjdk8 \
+  redis \
+  stunnel ; \
+  rm -rf /var/cache/apk/* ; \
+  mkdir -p /app
+
 WORKDIR /app
-RUN mkdir -p /app
-COPY --from=build /src/node_modules node_modules
-COPY --from=build /src/dist dist
+COPY --from=build /src/node_modules /app/node_modules
+COPY --from=build /src/dist /app/dist
 RUN chown -R node:node /app
 ENV NODE_ENV='production'
 USER 1000
