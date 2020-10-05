@@ -1,9 +1,16 @@
 FROM node:lts-alpine as build
+ENV CHROME_BIN='/usr/bin/chromium-browser'
+ENV CHROMIUM_PATH='/usr/bin/chromium-browser'
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 COPY . /src
 WORKDIR /src
 RUN set -eux ; \
   apk update ; \
+  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/community >> /etc/apk/repositories ; \
+  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/main >> /etc/apk/repositories ; \
   apk add --no-cache \
+  chromium@edge \
+  nss@edge \
   libx11 \
   libx11-dev \
   libx11-static \
