@@ -44,7 +44,9 @@ RUN set -eux ; \
 
 
 FROM node:lts-alpine as pdf-generator
-ENV CHROME_BIN="/usr/bin/chromium-browser"
+ENV CHROME_BIN='/usr/bin/chromium-browser'
+ENV CHROMIUM_PATH='/usr/bin/chromium-browser'
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV NODE_ENV='production'
 RUN set -eux ; \
   apk update ; \
