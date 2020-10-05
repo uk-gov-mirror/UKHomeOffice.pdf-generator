@@ -44,9 +44,15 @@ RUN set -eux ; \
 
 
 FROM node:lts-alpine as pdf-generator
+ENV CHROME_BIN="/usr/bin/chromium-browser"
+ENV NODE_ENV='production'
 RUN set -eux ; \
   apk update ; \
+  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/community >> /etc/apk/repositories ; \
+  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/main >> /etc/apk/repositories && \
   apk add --no-cache \
+  chromium@edge \
+  nss@edge \
   libx11 \
   libx11-dev \
   libx11-static \
@@ -75,7 +81,6 @@ WORKDIR /app
 COPY --from=build /src/node_modules /app/node_modules
 COPY --from=build /src/dist /app/dist
 RUN chown -R node:node /app
-ENV NODE_ENV='production'
 USER 1000
 EXPOSE 8080
 ENTRYPOINT exec node dist/bootstrap.js
