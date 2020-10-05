@@ -49,7 +49,7 @@ ENV NODE_ENV='production'
 RUN set -eux ; \
   apk update ; \
   echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/community >> /etc/apk/repositories ; \
-  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/main >> /etc/apk/repositories && \
+  echo @edge http://dl-cdn.alpinelinux.org/alpine/v3.8/main >> /etc/apk/repositories ; \
   apk add --no-cache \
   chromium@edge \
   nss@edge \
