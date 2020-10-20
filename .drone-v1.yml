@@ -20,6 +20,9 @@ steps:
     DRONE_SERVER: https://drone-gh.acp.homeoffice.gov.uk
     DRONE_TOKEN:
       from_secret: DRONE_PUBLIC_TOKEN
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -38,6 +41,9 @@ steps:
     DRONE_SERVER: https://drone-gh.acp.homeoffice.gov.uk
     DRONE_TOKEN:
       from_secret: DRONE_PUBLIC_TOKEN
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -56,6 +62,9 @@ steps:
     DRONE_SERVER: https://drone-gh.acp.homeoffice.gov.uk
     DRONE_TOKEN:
       from_secret: DRONE_PUBLIC_TOKEN
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -78,14 +87,15 @@ steps:
 - name: vulnerability-scan
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/anchore-submission:latest
+  environment:
+    IMAGE_NAME: acp-example-app:${DRONE_COMMIT_SHA}
+    SERVICE_URL: http://anchore-submission-server:10080
+    WHITELIST: CVE-2008-4318
   settings:
     dockerfile: Dockerfile
     image_name: cop-pdf-generator:${DRONE_COMMIT_SHA}
     local_image: true
     tolerate: low
-  volumes:
-  - name: dockersock
-    path: /var/run
   when:
     branch:
     - master
@@ -177,6 +187,9 @@ steps:
       from_secret: DEV_REDIS_TOKEN
     REDIS_URL:
       from_secret: DEV_REDIS_URL
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -247,6 +260,9 @@ steps:
       from_secret: DEV_REDIS_EFORMS_TOKEN
     REDIS_URL:
       from_secret: DEV_REDIS_EFORMS_URL
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -317,6 +333,9 @@ steps:
       from_secret: STAGING_REDIS_TOKEN
     REDIS_URL:
       from_secret: STAGING_REDIS_URL
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -389,6 +408,9 @@ steps:
       from_secret: PRODUCTION_REDIS_TOKEN
     REDIS_URL:
       from_secret: PRODUCTION_REDIS_URL
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -461,6 +483,9 @@ steps:
       from_secret: PRODUCTION_REDIS_EFORMS_TOKEN
     REDIS_URL:
       from_secret: PRODUCTION_REDIS_EFORMS_URL
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -494,6 +519,9 @@ steps:
       from_secret: PRODUCTION_SERVICE_NOW_PASSWORD
     SNOW_PROD_USER:
       from_secret: PRODUCTION_SERVICE_NOW_USERNAME
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -513,6 +541,9 @@ steps:
       from_secret: PRODUCTION_SERVICE_NOW_PASSWORD
     SNOW_PROD_USER:
       from_secret: PRODUCTION_SERVICE_NOW_USERNAME
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -534,6 +565,9 @@ steps:
       from_secret: PRODUCTION_SERVICE_NOW_PASSWORD
     SNOW_PROD_USER:
       from_secret: PRODUCTION_SERVICE_NOW_USERNAME
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
@@ -561,5 +595,28 @@ steps:
     status:
     - success
     - failure
+
+services:
+- name: docker
+  image: docker:19.03.12-dind
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+- name: anchore-submission-server
+  image: docker.digital.homeoffice.gov.uk/acp-anchore-submission:latest
+  commands:
+    - /anchore-submission server
+  environment:
+    ANCHORE_URL: "acp-anchore.acp.homeoffice.gov.uk"
+    REGISTRY_URL: "acp-ephemeral-registry.acp.homeoffice.gov.uk"
+  volumes:
+  - name: dockersock
+    path: /var/run
+
+volumes:
+- name: dockersock
+  temp: {}
+
 
 ...
