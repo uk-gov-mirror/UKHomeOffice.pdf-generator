@@ -76,7 +76,7 @@ steps:
   image: quay.io/ukhomeofficedigital/drone-docker
   commands:
   - n=0; while [ "$n" -lt 60 ] && [ ! -e /var/run/docker.sock ]; do n=$(( n + 1 )); sleep 1; done
-  - docker build -t cop-pdf-generator:$${DRONE_COMMIT_SHA} .
+  - docker build -t cop-pdf-generator:$${DRONE_COMMIT_SHA} . --no-cache
   volumes:
   - name: dockersock
     path: /var/run
