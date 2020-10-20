@@ -66,7 +66,11 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/drone-docker
   commands:
+  - n=0; while [ "$n" -lt 60 ] && [ ! -e /var/run/docker.sock ]; do n=$(( n + 1 )); sleep 1; done
   - docker build -t cop-pdf-generator:$${DRONE_COMMIT_SHA} .
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - push
@@ -79,6 +83,9 @@ steps:
     image_name: cop-pdf-generator:${DRONE_COMMIT_SHA}
     local_image: true
     tolerate: low
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -97,6 +104,9 @@ steps:
       from_secret: QUAY_PASSWORD
     DOCKER_USERNAME:
       from_secret: QUAY_USERNAME
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     branch:
     - master
@@ -464,6 +474,9 @@ steps:
   image: docker:git
   commands:
   - git show --name-only >> $SNOW_DESC_FILE
+  volumes:
+  - name: dockersock
+    path: /var/run
   when:
     event:
     - promote
