@@ -26,12 +26,3 @@ If you have a failed job then you will be presented with the failure:
 ![web hook failed](./docs/failedjob.png)
 
 Failed jobs can be retried as well as seeing what the underlying issue was with the failed job.
-
-
-
-Copyright (C) 2018-2020 Digital Patterns Limited
-    This program comes with ABSOLUTELY NO WARRANTY; for details see https://license.digitalpatterns.io
-    This is free software, and you are welcome to redistribute it under certain conditions;
-
-
-
