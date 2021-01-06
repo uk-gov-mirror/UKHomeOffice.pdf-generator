@@ -123,7 +123,7 @@
     "@types/winston": "^2.4.4",
     "@types/xregexp": "^3.0.30",
     "aws-sdk": "^2.521.0",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bluebird": "^3.5.5",
     "bootstrap": "^4.3.1",
     "bull": "^3.10.0",
