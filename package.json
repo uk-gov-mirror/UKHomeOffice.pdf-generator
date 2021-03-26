@@ -128,7 +128,7 @@
     "bootstrap": "^4.3.1",
     "bull": "^3.10.0",
     "bull-arena": "^2.6.3",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.9.1",
     "dotenv": "^8.0.0",
     "easy-pdf-merge": "^0.2.2",
