@@ -23,10 +23,10 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "1024Mi"
+            memory: "4096Mi"
             cpu: "6000m"
           limits:
-            memory: "1024Mi"
+            memory: "4096Mi"
             cpu: "6000m"
         livenessProbe:
           failureThreshold: 3
